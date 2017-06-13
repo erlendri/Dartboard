@@ -53,6 +53,9 @@
     <Compile Include="IDartGame.cs" />
     <Compile Include="IGameManager.cs" />
     <Compile Include="MessageQueue.cs" />
+    <Compile Include="Models\Game.cs" />
+    <Compile Include="Models\Gamer.cs" />
+    <Compile Include="Models\HomeModel.cs" />
     <Compile Include="OnScoreUpdatedArgs.cs" />
     <Compile Include="OnThrowReceivedArgs.cs" />
     <Compile Include="Program.cs" />

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Dart.GameManager;
+using Dart.GameManager.Models;
 using Microsoft.AspNet.SignalR;
 using Dart.Web.Interfaces;
-using Dart.Web.Models;
 
 namespace Dart.Web.Hubs
 {
@@ -98,8 +98,9 @@ namespace Dart.Web.Hubs
 
         private void StartNewGame(Gamer gamer)
         {
-            _gameManager.StartNewGame();
-            _storeManager.AddOrUpdateGame(GameFactory.CreateGame(gamer.Id));
+            var game = GameFactory.CreateGame(gamer.Id);
+            _gameManager.StartNewGame(game);
+            _storeManager.AddOrUpdateGame(game);
         }
 
         public Gamer AddPlayer(Gamer gamer)

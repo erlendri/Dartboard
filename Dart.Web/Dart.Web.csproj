@@ -230,9 +230,6 @@
     <Compile Include="Interfaces\IStoreManager.cs" />
     <Compile Include="Managers\ScoreSerializer.cs" />
     <Compile Include="Managers\StoreManager.cs" />
-    <Compile Include="Models\Game.cs" />
-    <Compile Include="Models\Gamer.cs" />
-    <Compile Include="Models\HomeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>

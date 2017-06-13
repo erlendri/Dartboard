@@ -1,5 +1,5 @@
 ﻿@using Microsoft.Ajax.Utilities
-@model Dart.Web.Models.HomeModel
+@model Dart.GameManager.Models.HomeModel
 <div class="jumbotron">
     <h1>Teleplan Globe dart scoreboard</h1>
     <br/>
@@ -12,7 +12,7 @@
 
     <p id="simulateNewPlayer" style="display: none;"><a class="btn btn-primary btn-lg">Simulate new player &raquo;</a></p>
     @*<p id="simulateExistingPlayer"><a class="btn btn-primary btn-lg">Simulate existing player &raquo;</a></p>*@
-    <p id="simulateThrow"><a class="btn btn-primary btn-lg">Simulate throw &raquo;</a></p>
+    <p id="simulateThrow" style="display: none;"><a class="btn btn-primary btn-lg">Simulate throw &raquo;</a></p>
 
     <p>
         <div id="newPlayer" style="display: none;">
@@ -97,6 +97,7 @@
                     });
                 $('#qrCodeReader').html5_qrcode(
                     function (data) {
+                        $('#qrCodeReader').html('QR: ' + data);
                         doRegister(data);
                     },
                     function (error) {

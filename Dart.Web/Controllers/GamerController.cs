@@ -1,5 +1,5 @@
-﻿using Dart.Web.Models;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
+using Dart.GameManager.Models;
 
 
 namespace Dart.Web.Controllers

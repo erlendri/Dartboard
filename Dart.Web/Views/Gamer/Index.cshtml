@@ -1,9 +1,10 @@
-﻿@model Dart.Web.Models.Gamer
+﻿@model Dart.GameManager.Models.Gamer
 
 <div class="card item" id="@Model.Id">
     <div class="gamesContainer">
         @*<div>@Model.Id</div>*@
         <div class="gamerDisplayName">@Model.DisplayName</div>
+        @*<div class="gamerQrData">@Model.QrData</div>*@
         <div class="gamerGames">
             @foreach (var game in Model.Games)
             {

@@ -27,7 +27,12 @@ div.jumbotron div.card {
     div.card > div.gamesContainer {
         display: table-row;
     }
-
+/*div.gamerQrData {
+    display: none;
+}
+div.jumbotron div.gamerQrData {
+    display: table-row;
+}*/
 div.gamesContainer > div.gamerDisplayName {
     width: 30%;
     display: table-cell;

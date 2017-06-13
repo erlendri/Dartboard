@@ -1,7 +1,7 @@
 ﻿using Dart.Web.Interfaces;
-using Dart.Web.Models;
 using System.Linq;
 using System.Web.Mvc;
+using Dart.GameManager.Models;
 
 namespace Dart.Web.Controllers
 {

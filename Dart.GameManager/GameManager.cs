@@ -2,6 +2,7 @@
 using System.CodeDom;
 using System.Text;
 using System.Threading.Tasks;
+using Dart.GameManager.Models;
 
 
 namespace Dart.GameManager
@@ -23,11 +24,10 @@ namespace Dart.GameManager
         {
             MyDartboardListener = myDartboardListener;
             MyBeerPublisher = myBeerPublisher;
-            StartNewGame();
             MyDartboardListener.ThrowReceivedEvent += MyDartboardListener_ThrowReceivedEvent;
         }
 
-        public void StartNewGame()
+        public void StartNewGame(Game game)
         {
             CurrentGame = new DartGame();
         }

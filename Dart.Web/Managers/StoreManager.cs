@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.IO;
+using Dart.GameManager.Models;
 using Dart.Web.Interfaces;
-using Dart.Web.Models;
 
 namespace Dart.Web.Managers
 {
