@@ -53,12 +53,12 @@ namespace Dart.GameManager
             {
                 Console.WriteLine("Beer poured!");
                 MyBeerPublisher.PourBeer();
-                CurrentGame.Reset();
+                //CurrentGame.Reset();
                 Console.WriteLine("Game complete.");
             }
             else if(CurrentGame.IsComplete)
             {
-                CurrentGame.Reset();
+                //CurrentGame.Reset();
                 Console.WriteLine("Game complete.");
             }
            

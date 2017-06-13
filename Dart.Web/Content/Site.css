@@ -1,0 +1,110 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+div.card {
+    display: table;
+    width: 95%;
+}
+div.jumbotron div.card {
+    margin-bottom: 15px;
+}
+
+    div.card > div.gamesContainer {
+        display: table-row;
+    }
+
+div.gamesContainer > div.gamerDisplayName {
+    width: 30%;
+    display: table-cell;
+}
+
+div.gamesContainer > div.gamerGames {
+    display: inline-table;
+    width: 100%;
+}
+
+div.gamerGames > div.gamerGame {
+    display: table-row;
+}
+
+    div.gamerGames > div.gamerGame > div {
+        display: table-cell;
+        padding-bottom: 15px;
+        width: 15%;
+    }
+
+div.card:hover div.gamerDisplayName,
+div.card:hover div.gamerGames > div.bestScore {
+    color: green;
+    background-color: beige;
+}
+
+div.card .lowScore {
+    display: none !important;
+}
+
+div.card:hover .lowScore {
+    display: table-row !important;
+}
+
+div.card:hover {
+    border: 1px solid black;
+}
+
+div.jumbotron div.card:hover {
+    border: none;
+}
+
+div.jumbotron div.bestScore {
+    display: none !important;
+}
+
+div.jumbotron:hover div.bestScore {
+    display: none !important;
+}
+
+div.jumbotron div.lowScore {
+    display: none !important;
+}
+
+div.jumbotron:hover div.lowScore {
+    display: none !important;
+}
+
+div.jumbotron div.gamerGames > div.current {
+    display: table-row !important;
+}
+
+div.gameremove {
+    color: red;
+    display: none !important;
+    /*display: table-cell !important;*/
+}
+
+div.card:hover div.gameremove {
+    display: table-cell !important;
+    cursor: pointer;
+    text-decoration: underline;
+}
+#register {
+    margin-top: 15px;
+}
+
+input.hasError {
+    color: red;
+}
