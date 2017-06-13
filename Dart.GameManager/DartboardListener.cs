@@ -24,6 +24,8 @@ namespace Dart.GameManager
         
         public delegate void ThrowReceived(object sender, OnThrowReceivedArgs args);
 
+        private string _clientId;
+        private DateTime _start = DateTime.Now;
         public virtual void OnThrowReceived(OnThrowReceivedArgs args)
         {
             ThrowReceivedEvent?.Invoke(this, args);
@@ -40,6 +42,9 @@ namespace Dart.GameManager
             MqttClient.ConnectionClosed += MqttClient_ConnectionClosed;
             MqttClient.Subscribe(new[] { "dartfeed" }, new[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
             MqttClient.MqttMsgPublishReceived += Client_MqttMsgPublishReceived;
+            MqttClient.ConnectionClosed += MqttClient_ConnectionClosed;
+
+        }
 
         }
 

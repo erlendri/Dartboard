@@ -1,0 +1,22 @@
+﻿@model Dart.Web.Models.Gamer
+
+<div class="card item" id="@Model.Id">
+    <div class="gamesContainer">
+        @*<div>@Model.Id</div>*@
+        <div class="gamerDisplayName">@Model.DisplayName</div>
+        <div class="gamerGames">
+            @foreach (var game in Model.Games)
+            {
+                <div class="gamerGame @((game.Id.Equals(@Model.BestGameId)) ? "bestScore" : "lowScore") @((game.IsCurrent) ? "current" : "")">
+                    <div class="gamescore gameSequenceNo">Game @game.SequenceNo</div>
+                    <div class="gamescore gamescore1">@game.ScoreThrow1</div>
+                    <div class="gamescore gamescore2">@game.ScoreThrow2</div>
+                    <div class="gamescore gamescore3">@game.ScoreThrow3</div>
+                    <div class="gamescore gamescoreTotal">@game.TotalScore</div>
+                    <div><div class="gamescore gameremove" data-gameid="@(game.Id)">Delete</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
