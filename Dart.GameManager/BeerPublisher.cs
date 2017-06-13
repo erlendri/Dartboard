@@ -8,22 +8,46 @@ namespace Dart.GameManager
 {
     public class BeerPublisher : IBeerPublisher
     {
+        public bool IsDisconecting { get; set; } = false;
+        public string ClientId { get; set; }
+
         public MqttClient MqttClient { get; set; }
         
         public BeerPublisher(MqttClient mqttClient)
         {
-            // create client instance
             MqttClient = mqttClient;
 
-            string clientId = Guid.NewGuid().ToString();
-            MqttClient.Connect(clientId);    
+            ClientId = Guid.NewGuid().ToString();
+            MqttClient.ConnectionClosed += MqttClient_ConnectionClosed;
+            ConnectClient();    
+        }
+        
+
+        public void Disconnect()
+        {
+            if (MqttClient == null)
+                return;
+
+            IsDisconecting = true;
+            
+            if (MqttClient.IsConnected)
+                MqttClient.Disconnect();
+            IsDisconecting = false;
         }
 
+        public void ConnectClient()
+        {
+            MqttClient.Connect(ClientId, "", "", false, ushort.MaxValue);
+        }
 
         public void PourBeer() 
         {
             MqttClient.Publish("servo", Encoding.UTF8.GetBytes("1000"));
         }
-        
+
+        private void MqttClient_ConnectionClosed(object sender, EventArgs e)
+        {
+            Console.WriteLine("Connection closed...");
+        }
     }
 }
