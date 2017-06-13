@@ -24,7 +24,7 @@ namespace Dart.GameManager
             dartThrows.Add(points);
         }
 
-    public bool IsComplete => ThrowsCounter >= 3;
+        public bool IsComplete => ThrowsCounter >= 3;
         public int FirstThrow => GetDartThrow(1);
         public int SecondThrow => GetDartThrow(2);
         public int ThirdThrow => GetDartThrow(3);

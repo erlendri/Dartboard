@@ -31,7 +31,7 @@ namespace Dart.GameManager
             IsDisconecting = true;
             
             if (MqttClient.IsConnected)
-                MqttClient.Disconnect();
+            MqttClient.Disconnect();
             IsDisconecting = false;
         }
 
@@ -42,6 +42,8 @@ namespace Dart.GameManager
 
         public void PourBeer() 
         {
+            // One second bluelights blink
+            MqttClient.Publish("trigger", Encoding.UTF8.GetBytes("3000"));
             MqttClient.Publish("servo", Encoding.UTF8.GetBytes("1000"));
         }
 

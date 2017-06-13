@@ -36,18 +36,14 @@ namespace Dart.GameManager
             // create client instance
             MqttClient = mqttClient; 
             
-            
             ClientId = Guid.NewGuid().ToString();
             ConnectClient();
             MqttClient.ConnectionClosed += MqttClient_ConnectionClosed;
             MqttClient.Subscribe(new[] { "dartfeed" }, new[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
             MqttClient.MqttMsgPublishReceived += Client_MqttMsgPublishReceived;
             MqttClient.ConnectionClosed += MqttClient_ConnectionClosed;
-
         }
-
-        }
-
+        
         private void MqttClient_ConnectionClosed(object sender, EventArgs e)
         {
             Console.WriteLine("Connection closed...");
@@ -77,10 +73,7 @@ namespace Dart.GameManager
 
             if (string.IsNullOrEmpty(message))
                 return;
-
-            // One second bluelights blink
-            MqttClient.Publish("trigger", Encoding.UTF8.GetBytes("1000"));
-
+            
             int points = CalculatePoints(message);
             var throwReceivedArgs = new OnThrowReceivedArgs() {Points = points};
 
@@ -98,3 +91,4 @@ namespace Dart.GameManager
          }
     }
 }
+
