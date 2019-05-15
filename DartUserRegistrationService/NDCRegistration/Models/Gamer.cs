@@ -14,12 +14,9 @@ namespace NDCRegistration.Models
         [Required]
         public string DisplayName { get; set; }
         [DisplayName("First name")]
-        [Required]
         public string FirstName { get; set; }
-        [Required]
         [DisplayName("Last name")]
         public string LastName { get; set; }
-        [Required]
         [DisplayName("Email")]
         [EmailAddress]
         public string Email { get; set; }

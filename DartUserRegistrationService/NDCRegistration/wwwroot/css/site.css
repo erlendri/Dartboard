@@ -45,10 +45,15 @@ body {
 }
 
 #preview {
-    max-width: calc(100vw - 30px);
-    max-height: 50vh;
+    /*max-width: calc(100vw - 30px);
+    max-height: 50vh;*/
+    margin: auto;
+    /*width: 50vh;*/
+    height: 25vh;
 }
-
+#camera {
+    display: flex;
+}
 #cameralist-content {
     list-style: none;
     margin: 0px;
