@@ -16,32 +16,51 @@ namespace ScoreboardTestBed
         {
             var client = new MqttMessageHandler("127.0.0.1");
 
-            client.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
+            client.MqttMsgPublishReceived += PublishReceived;
 
+            var gamerId = Guid.NewGuid();
+            client.Subscribe(Topics.Gamer);
 
-            client.Subscribe("/geopackman/score");
-
-            Gamer packmanPlayer = new Gamer()
+            var packmanPlayer = new Gamer()
             {
-                Id = Guid.NewGuid(),
+                Id = gamerId,
                 Email ="email@gamer.com",
                 FirstName="John",
                 LastName="Doe"
             };
 
-            client.Publish<Gamer>("/geopackman/score", packmanPlayer);
+            client.Publish<Gamer>(Topics.Gamer, packmanPlayer);
+            
+            client.Subscribe(Topics.Score);
+
+            var score = new Score(gamerId, 1337);
+            client.Publish<Score>(Topics.Score, score);
+           
         }
 
         
 
-        private static void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
+        public static void PublishReceived(object sender, MqttMsgPublishEventArgs e)
         {
-            var message = Encoding.Default.GetString (e.Message);
-            Console.WriteLine($"Score received: {message}");
+            if (e.Topic == "/geopackman/Gamer")
+            {
+                var message = Encoding.Default.GetString(e.Message);
+                Console.WriteLine($"Gamer received: {message}");
 
-            var wiredGamer = JsonConvert.DeserializeObject<Gamer>(message);
-           
-            Console.WriteLine($"Email from transferred gamer: {wiredGamer.Email}");
+                var wiredGamer = JsonConvert.DeserializeObject<Gamer>(message);
+
+                Console.WriteLine($"Email from transferred gamer: {wiredGamer.Email}");
+            }
+            else
+            {
+                var message = Encoding.Default.GetString(e.Message);
+                Console.WriteLine($"Score received: {message}");
+
+                var wiredScore = JsonConvert.DeserializeObject<Score>(message);
+
+                Console.WriteLine($"Score for transferred gamer: {wiredScore.GameScore}");
+            }
+            Console.WriteLine("\n");
             Console.ReadKey();
         }
     }
