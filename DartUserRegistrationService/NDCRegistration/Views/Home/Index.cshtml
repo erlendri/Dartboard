@@ -1,151 +1,86 @@
 ﻿@model Gamer
 @{
-  ViewData["Title"] = "Registration";
+  ViewData["Title"] = "Scoreboard";
 }
+<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
+  <ol class="carousel-indicators">
+    <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+    <li data-target="#myCarousel" data-slide-to="1"></li>
+    <li data-target="#myCarousel" data-slide-to="2"></li>
+  </ol>
+  <div class="carousel-inner" role="listbox">
+    <div class="item active">
+      <img src="~/images/banner1.svg" alt="ASP.NET" class="img-responsive" />
+      <div class="carousel-caption" role="option">
+        <p>
+          Learn how to build ASP.NET apps that can run anywhere.
+          <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525028&clcid=0x409">
+            Learn More
+          </a>
+        </p>
+      </div>
+    </div>
+    <div class="item">
+      <img src="~/images/banner2.svg" alt="Visual Studio" class="img-responsive" />
+      <div class="carousel-caption" role="option">
+        <p>
+          There are powerful new features in Visual Studio for building modern web apps.
+          <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525030&clcid=0x409">
+            Learn More
+          </a>
+        </p>
+      </div>
+    </div>
+    <div class="item">
+      <img src="~/images/banner3.svg" alt="Microsoft Azure" class="img-responsive" />
+      <div class="carousel-caption" role="option">
+        <p>
+          Learn how Microsoft's Azure cloud platform allows you to build, deploy, and scale web apps.
+          <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525027&clcid=0x409">
+            Learn More
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+  <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+</div>
 
-<h4>Register a new gamer</h4>
+<h4>Currently playing</h4>
+<div id="player-current" class="section">
+  <div id="player-1" class="player">
+    <div class="player-name">Player 1</div>
+    <div class="player-score">1234</div>
+    <div class="player-button-delete"></div>
+    <div class="player-button-start"></div>
+  </div>
+</div>
 <hr />
-<div class="section" id="camera">
-  <video id="preview" class="hidden"></video>
+<h4>Next</h4>
+<div id="player-next" class="section">
+  <div id="player-2" class="player">
+    <div class="player-name">Player 2</div>
+    <div class="player-score"></div>
+    <div class="player-button-delete player-button"><span></span></div>
+    <div class="player-button-start player-button"><span></span></div>
+  </div>
+  <div id="player-3" class="player">
+    <div class="player-name">Player 3</div>
+    <div class="player-score"></div>
+    <div class="player-button-delete player-button"><span></span></div>
+    <div class="player-button-start player-button"><span></span></div>
+  </div>
 </div>
-<div class="section">
-  <label id="cameralist-label" class="control-label">Discovered cameras: <span id=camera-count>0</span> (click to show/switch)</label>
-  <ul id="cameralist-content" class="hidden"></ul>
-</div>
-<div class="section" id="form-container">
-  <form asp-controller="Home" asp-action="Register" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="form-group">
-      <label asp-for="DisplayName" class="control-label"></label>
-      <input asp-for="DisplayName" class="form-control" placeholder="Enter display name" />
-      <span asp-validation-for="DisplayName" class="text-danger"></span>
-    </div>
-    <div class="form-group">Enter <hr /></div>
-    <div class="form-group">
-      <label asp-for="QrCode" class="control-label"></label>
-      <input asp-for="QrCode" class="form-control" id="qrCode" placeholder="Scan a QR code..." />
-      <span asp-validation-for="QrCode" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-      <input type="submit" value="Queue gamer" class="btn btn-primary" />
-    </div>
-    <div class="form-group">OR <hr /></div>
-    <div class="form-group">
-      <label asp-for="FirstName" class="control-label"></label>
-      <input asp-for="FirstName" class="form-control" placeholder="Enter first name" />
-      <span asp-validation-for="FirstName" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-      <label asp-for="LastName" class="control-label"></label>
-      <input asp-for="LastName" class="form-control" placeholder="Enter last name" />
-      <span asp-validation-for="LastName" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-      <label asp-for="Email" class="control-label"></label>
-      <input asp-for="Email" class="form-control" placeholder="Enter email" />
-      <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-      <input type="submit" value="Queue gamer" class="btn btn-primary" />
-    </div>
-  </form>
-</div>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/3.3.3/adapter.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.min.js"></script>
-<script type="text/javascript" src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 
 @section Scripts {
   @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
 <script type="text/javascript">
-  let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-  let qrcode = document.getElementById('qrCode');
-  scanner.addListener('scan', function (content) {
-    qrcode.value = content;
-    console.log(content);
-  });
-  Instascan.Camera.getCameras().then(function (cameras) {
-    let cameralist = document.getElementById("cameralist-content");
-    let cameralabel = document.getElementById("cameralist-label");
-    let cameracount = document.getElementById("camera-count");
-    cameracount.innerHTML = cameras.length.toString();
-    cameralabel.addEventListener('click', v => {
-      if (cameralist.classList.contains('hidden'))
-        cameralist.classList.remove('hidden');
-      else
-        cameralist.classList.add('hidden');
-    });
-    let preview = document.getElementById('preview');
-    cameralist.innerHTML = "";
-    if (cameras.length > 0) {
-      var cameraid = getCookie('camera-id');
-      if (isNaN(cameraid))
-        cameraid = "0";
-
-      for (var i = 0; i < cameras.length; i++) {
-        addCamera(formatName(cameras[i].name), cameralist, i);
-      }
-      preview.classList.remove('hidden');
-      scanner.start(cameras[parseInt(cameraid)]);
-
-      cameralist.addEventListener('click', v => {
-        var target = v.target;
-        var id = target.getAttribute('data-id');
-        if (id === null || id === undefined)
-          return;
-        scanner.start(cameras[parseInt(id)]);
-        setCookie('camera-id', id, 10);
-        document.cookie = id;
-        cameralist.classList.add('hidden');
-      });
-    } else {
-      preview.classList.add('hidden');
-      addCameraError('No cameras found', cameralist);
-    }
-  }).catch(function (e) {
-    console.error(e);
-  });
-  function addCameraError(text, list) {
-    var div = document.createElement('div');
-    div.classList.add('camera-error');
-    div.innerHTML = text;
-    list.appendChild(div);
-  }
-  function addCamera(text, list, id) {
-    var li = document.createElement('li');
-    li.classList.add('select-none');
-
-    var btn = document.createElement('input');
-    btn.type = 'button';
-    btn.value = text;
-    btn.classList.add('btn');
-    btn.classList.add('btn-primary');
-    btn.setAttribute('data-id', id.toString())
-    li.appendChild(btn);
-    list.appendChild(li);
-  }
-  function formatName(name) {
-    return name || '(unknown)';
-  }
-  function getCookie(cname) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) == ' ') {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
-    }
-    return "";
-  }
-  function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    var expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-  }
 </script>

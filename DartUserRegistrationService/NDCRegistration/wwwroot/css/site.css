@@ -51,9 +51,11 @@ body {
     /*width: 50vh;*/
     height: 25vh;
 }
+
 #camera {
     display: flex;
 }
+
 #cameralist-content {
     list-style: none;
     margin: 0px;
@@ -81,6 +83,7 @@ body {
     .row ul li {
         margin: 5px 3px 5px 3px;
     }
+
 .btn {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -95,3 +98,102 @@ body {
         display: none;
     }
 }
+
+.player {
+    border-radius: 15px;
+    background: url("../images/playerbackground.svg");
+    background-size: 100% 100%;
+    display: grid;
+    justify-items: flex-start;
+    align-items: center;
+    font-size: 18px;
+}
+
+    .player .player-name,
+    .player .player-score {
+        padding: 15px 7px 15px 5px;
+        font-weight: bold;
+        color: white;
+    }
+    .player .player-name {
+        grid-area: name;
+    }
+    .player .player-score {
+        min-width: 100px;
+        height: 80px;
+        display: block;
+        border-radius: 5px;
+        border-color: red;
+        background-color: red;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 80px;
+    }
+
+#player-current,
+#player-next {
+    display: grid;
+    grid-gap: 7px;
+}
+
+    #player-current .player,
+    #player-next .player {
+        display: grid;
+    }
+
+    #player-current > .player {
+        grid-template: "blank name score" 100px/25px auto 120px;
+    }
+
+        #player-current > .player .player-button-delete,
+        #player-current > .player .player-button-start {
+            display: none;
+        }
+
+    #player-next > .player {
+        grid-template: "blank name delete play" 80px/25px auto 80px 80px;
+    }
+
+        #player-next > .player .player-score {
+            display: none;
+        }
+
+    #player-current .player-score {
+        grid-area: score;
+    }
+
+.player-button span {
+    margin: 14px;
+    height: 50px;
+    width: 50px;
+    display: block;
+    background-size: 40px 40px !important;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+    .player-button span:hover {
+        border: 2px solid white;
+    }
+
+.player-button-delete {
+    grid-area: delete;
+}
+
+    .player-button-delete span {
+        background: url(../images/delete.svg) no-repeat center center;
+    }
+
+.player-button-start {
+    grid-area: play;
+}
+
+    .player-button-start span {
+        background: url(../images/play-button.svg) no-repeat center center;
+    }
+
+/*.player > div {
+    border: 1px solid red;
+}*/
+
+/*tpg-hackathon.westeurope.cloudapp.azure.com*/
