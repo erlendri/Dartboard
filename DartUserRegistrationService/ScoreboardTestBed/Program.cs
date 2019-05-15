@@ -14,7 +14,7 @@ namespace ScoreboardTestBed
     {
         static void Main(string[] args)
         {
-            var client = new MqttMessageHandler("127.0.0.1");
+            var client = new MqttMessageHandler("tpg-hackathon.westeurope.cloudapp.azure.com");
 
             client.MqttMsgPublishReceived += PublishReceived;
 
@@ -61,7 +61,7 @@ namespace ScoreboardTestBed
                 Console.WriteLine($"Score for transferred gamer: {wiredScore.GameScore}");
             }
             Console.WriteLine("\n");
-            Console.ReadKey();
+           
         }
     }
 }

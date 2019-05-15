@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DartUserRegistrationService", "DartUserRegistrationService\DartUserRegistrationService.csproj", "{0521E776-C4F7-480C-B3C6-5C930A0CBC34}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NDCRegistration", "NDCRegistration\NDCRegistration.csproj", "{D0484E98-DB2E-4C99-99DE-7C6084C08B97}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dart.Messaging", "Dart.Messaging\Dart.Messaging.csproj", "{A8F6AD73-B510-4369-B3D8-577F957AAFD0}"
@@ -17,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0521E776-C4F7-480C-B3C6-5C930A0CBC34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0521E776-C4F7-480C-B3C6-5C930A0CBC34}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0521E776-C4F7-480C-B3C6-5C930A0CBC34}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0521E776-C4F7-480C-B3C6-5C930A0CBC34}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D0484E98-DB2E-4C99-99DE-7C6084C08B97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D0484E98-DB2E-4C99-99DE-7C6084C08B97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0484E98-DB2E-4C99-99DE-7C6084C08B97}.Release|Any CPU.ActiveCfg = Release|Any CPU
