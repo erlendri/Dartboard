@@ -5,10 +5,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DartUserRegistrationService.Models
+namespace Dart.Messaging.Models
 {
     public class Gamer
     {
+        public Guid Id { get; set; }
+
         [DisplayName("Firstname")]
         [Required]
         public string FirstName { get; set; }

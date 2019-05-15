@@ -1,4 +1,4 @@
-﻿using DartUserRegistrationService.Models;
+﻿
 using System;
 using System.Net;
 using System.Text;
@@ -6,6 +6,7 @@ using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using Newtonsoft.Json;
 using Dart.Messaging;
+using Dart.Messaging.Models;
 
 namespace ScoreboardTestBed
 {
@@ -22,15 +23,13 @@ namespace ScoreboardTestBed
 
             Gamer packmanPlayer = new Gamer()
             {
+                Id = Guid.NewGuid(),
                 Email ="email@gamer.com",
                 FirstName="John",
                 LastName="Doe"
             };
 
-
             client.Publish<Gamer>("/geopackman/score", packmanPlayer);
-         
-            
         }
 
         
