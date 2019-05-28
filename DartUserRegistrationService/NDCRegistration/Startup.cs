@@ -36,6 +36,7 @@ namespace NDCRegistration
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSignalR();
+            services.AddSingleton<IMqttHandler, MqttHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

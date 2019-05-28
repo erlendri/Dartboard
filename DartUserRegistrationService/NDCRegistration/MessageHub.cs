@@ -8,6 +8,14 @@ namespace NDCRegistration.Hubs
 {
     public class MessageHub : Hub
     {
+        public Guid Id { get; }
+        private IMqttHandler MqttHandler { get; }
+
+        public MessageHub(IMqttHandler mqttHandler)
+        {
+            Id = Guid.NewGuid();
+            MqttHandler = mqttHandler;
+        }
         public async Task SendMessage(ScoreMessage message)
         {
             //newtonsoft JsonConvert
@@ -19,14 +27,19 @@ namespace NDCRegistration.Hubs
         }
         public async Task StartGame(Guid gamerId)
         {
-            await GameStarted(new Gamer
+            var gamer = new Gamer
             {
                 Id = gamerId,
                 DisplayName = gamerId.ToString(),
                 FirstName = "Hello",
                 LastName = "World",
                 Email = "test@test.com"
+            };
+            await Task.Run(() =>
+            {
+                MqttHandler.PostGameStart(gamer);
             });
+            //await GameStarted(gamer);
         }
         public async Task GameStarted(Gamer gamer)
         {
