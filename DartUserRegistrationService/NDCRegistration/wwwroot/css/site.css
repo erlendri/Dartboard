@@ -106,7 +106,7 @@ body {
     display: grid;
     justify-items: flex-start;
     align-items: center;
-    font-size: 18px;
+    font-size: 25px;
 }
 
     .player .player-name,
@@ -120,14 +120,8 @@ body {
     }
     .player .player-score {
         min-width: 100px;
-        height: 80px;
-        display: block;
-        border-radius: 5px;
-        border-color: red;
-        background-color: red;
         text-align: center;
-        vertical-align: middle;
-        line-height: 80px;
+        font-size: 40px;
     }
 
 #player-current,

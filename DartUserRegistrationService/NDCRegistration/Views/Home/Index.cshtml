@@ -1,5 +1,4 @@
-﻿@model Gamer
-@{
+﻿@{
   ViewData["Title"] = "Scoreboard";
 }
 <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
@@ -55,7 +54,7 @@
 
 <h4>Currently playing</h4>
 <div id="player-current" class="section">
-  <div id="player-1" class="player">
+  <div id="@(Guid.NewGuid())" class="player">
     <div class="player-name">Player 1</div>
     <div class="player-score">1234</div>
     <div class="player-button-delete"></div>
@@ -65,13 +64,13 @@
 <hr />
 <h4>Next</h4>
 <div id="player-next" class="section">
-  <div id="player-2" class="player">
+  <div id="@(Guid.NewGuid())" class="player">
     <div class="player-name">Player 2</div>
     <div class="player-score"></div>
     <div class="player-button-delete player-button"><span></span></div>
     <div class="player-button-start player-button"><span></span></div>
   </div>
-  <div id="player-3" class="player">
+  <div id="@(Guid.NewGuid())" class="player">
     <div class="player-name">Player 3</div>
     <div class="player-score"></div>
     <div class="player-button-delete player-button"><span></span></div>
@@ -81,6 +80,7 @@
 
 @section Scripts {
   @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+  <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+  <script src="~/js/message.js"></script>
 }
-<script type="text/javascript">
-</script>

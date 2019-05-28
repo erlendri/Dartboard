@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Dart.Messaging.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NDCRegistration.Hubs;
 using NDCRegistration.Models;
 
 namespace NDCRegistration.Controllers
@@ -13,7 +15,7 @@ namespace NDCRegistration.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+             return View();
         }
         [HttpPost]
         public IActionResult Register(Gamer model)
