@@ -11,5 +11,6 @@ namespace NDCRegistration
         }
 
         public DbSet<Gamer> Gamers { get; set; }
+        public DbSet<Game> Games { get; set; }
     }
 }

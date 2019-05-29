@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NDCRegistration;
 
 namespace NDCRegistration.Migrations
 {
     [DbContext(typeof(GamerContext))]
-    partial class GamerContextModelSnapshot : ModelSnapshot
+    [Migration("20190529181916_NDCRegistration.GamerContext2")]
+    partial class NDCRegistrationGamerContext2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +36,7 @@ namespace NDCRegistration.Migrations
 
                     b.HasIndex("GamerId");
 
-                    b.ToTable("Games");
+                    b.ToTable("Game");
                 });
 
             modelBuilder.Entity("Dart.Messaging.Models.Gamer", b =>
