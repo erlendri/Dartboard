@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NDCRegistration
 {
-    interface IGamerStorage
+    public interface IGamerStorage
     {
         Gamer GetGamer(Guid id);
         Gamer CreateOrUpdateGamer(Gamer gamer);

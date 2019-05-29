@@ -31,7 +31,9 @@ namespace NDCRegistration
 
         public Gamer CreateOrUpdateGamer(Gamer gamer)
         {
-            var existing = Gamers.FirstOrDefault(f => f.QrCode == gamer.QrCode || f.Email == gamer.Email);
+            var existing = Gamers.FirstOrDefault(f => 
+            (!string.IsNullOrWhiteSpace(gamer.QrCode) && f.QrCode == gamer.QrCode) || 
+            (!string.IsNullOrWhiteSpace(gamer.Email) && f.Email == gamer.Email));
             if (existing != null)
             {
                 Gamers.Remove(existing);

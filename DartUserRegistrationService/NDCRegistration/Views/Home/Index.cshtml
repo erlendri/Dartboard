@@ -1,4 +1,5 @@
-﻿@{
+﻿@using NDCRegistration
+@{
   ViewData["Title"] = "Scoreboard";
 }
 <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
@@ -77,10 +78,57 @@
     <div class="player-button-start player-button"><span></span></div>
   </div>
 </div>
+<template id="player-template">
+  <div id="@(Guid.Empty)" class="player">
+    <div class="player-name">Player name</div>
+    <div class="player-score">1234</div>
+    <div class="player-button-delete player-button"><span></span></div>
+    <div class="player-button-start player-button"><span></span></div>
+  </div>
 
+</template>
 @section Scripts {
   @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
   <script src="~/lib/signalr/dist/browser/signalr.js"></script>
   <script src="~/js/message.js"></script>
+  <script type="text/javascript">
+    var connection = new signalR.HubConnectionBuilder().withUrl("/messageHub").build();
+    
+    connection.on("@(SignalRTopics.GameAdded)", function (game) {
+      console.log(game);
+      app.AddPlayerNext(game)
+      alert(`Game started for id ${game.id}`);
+    });
+    connection.on("@(SignalRTopics.GameCompleted)", function (game) {
+      console.log(game);
+      alert(`Game completed for id ${game.id}`);
+    });
+    connection.on("@(SignalRTopics.GameDeleted)", function (gamerId) {
+      console.log(gamerId);
+      alert(`Game completed for id ${gamerId}`);
+    });
+    connection.on("@(SignalRTopics.ScoreUpdate)", function (game) {
+      console.log(game);
+      alert(`Score updated for id ${game.id} : ${game.score}`);
+    });
+
+    connection.start().then(function () {
+      console.log('Ready to receive SignalR');
+      app.Init();
+
+    }).catch(function (err) {
+      return console.error(err.toString());
+    });
+
+    let hub = {
+      HelloServer: () => {
+        connection.invoke('HelloServer');
+      },
+      StartGame: (id) => {
+        connection.invoke('StartGame', id);
+      }
+    }
+
+  </script>
 }

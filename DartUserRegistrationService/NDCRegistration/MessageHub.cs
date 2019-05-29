@@ -9,39 +9,29 @@ namespace NDCRegistration.Hubs
     public class MessageHub : Hub
     {
         public Guid Id { get; }
-        private IMqttHandler MqttHandler { get; }
+        private readonly IMqttHandler _mqttHandler;
+        private readonly IGamerStorage _gamerStorage;
 
-        public MessageHub(IMqttHandler mqttHandler)
+        public MessageHub(IMqttHandler mqttHandler, IGamerStorage gamerStorage)
         {
             Id = Guid.NewGuid();
-            MqttHandler = mqttHandler;
+            _mqttHandler = mqttHandler;
+            _gamerStorage = gamerStorage;
+            
         }
-        public async Task SendMessage(ScoreMessage message)
+        public async Task StartGame(Guid id)
         {
-            //newtonsoft JsonConvert
-            await Clients.All.SendAsync("ScoreMessage", "hello world");
-        }
-        public async Task HelloServer()
-        {
-            await Task.CompletedTask;
-        }
-        public async Task StartGame(Guid gamerId)
-        {
-            var gamer = new GamerMinimal
-            {
-                Id = gamerId,
-                Name = gamerId.ToString(),
-                MaxTries = 3
-            };
+            var gamer = _gamerStorage.GetGamer(id).ToMinimal();
             await Task.Run(() =>
             {
-                MqttHandler.PostGameStart(gamer);
+                _mqttHandler.PostGameStarted(gamer);
             });
-            //await GameStarted(gamer);
         }
-        public async Task GameStarted(Gamer gamer)
+        public async Task DeleteGame(Guid id)
         {
-            await Clients.All.SendAsync("GameStarted", gamer);
+            _gamerStorage.DeleteGame(id);
+            await MessageHubMethods.SendGameDeleted((IHubContext<MessageHub>)Context, id);
+
         }
     }
 }

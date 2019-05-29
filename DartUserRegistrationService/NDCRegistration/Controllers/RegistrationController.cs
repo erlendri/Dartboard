@@ -14,18 +14,15 @@ namespace NDCRegistration.Controllers
 {
     public class RegistrationController : Controller
     {
-        private readonly IHubContext<MessageHub> HubContext;
+        private readonly IHubContext<MessageHub> _hubContext;
+        private readonly IGamerStorage _gamerStorage;
 
-        public RegistrationController(IHubContext<MessageHub> hubContext)
+        public RegistrationController(IGamerStorage gamerStorage, IHubContext<MessageHub> hubContext)
         {
-            HubContext = hubContext;
+            _hubContext = hubContext;
+            _gamerStorage = gamerStorage;
         }
-        public IMqttHandler Handler { get; private set; }
 
-        public RegistrationController(IMqttHandler handler)
-        {
-            Handler = handler;
-        }
         public IActionResult Index()
         {
             return View();
@@ -44,6 +41,14 @@ namespace NDCRegistration.Controllers
                 !string.IsNullOrWhiteSpace(model.Email);
             if (hasQr || hasDetails)
             {
+                var gamer = _gamerStorage.CreateOrUpdateGamer(model);
+                var game = _gamerStorage.CreateGame(new Game
+                {
+                    GamerId = gamer.Id,
+                    Score = 0,
+                    State = GameState.Pending
+                });
+                MessageHubMethods.SendGameAdded(_hubContext, gamer).Wait();
                 //post mqtt
                 Response.Redirect("index");
             }

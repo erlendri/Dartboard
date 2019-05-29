@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -31,12 +32,13 @@ namespace Dart.Messaging.Models
                 MaxTries = 3
             };
         }
-
+        public List<Game> Games { get; set; } = new List<Game>();
     }
     public class GamerMinimal
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
         public int MaxTries { get; set; }
+        public int Score { get; set; }
     }
 }

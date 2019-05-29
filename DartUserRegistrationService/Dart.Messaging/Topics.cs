@@ -12,7 +12,7 @@ namespace Dart.Messaging
         ///// <summary>
         /// "{\"id\": \"007\", \"name\": \"James Bond\", \"maxTries\":3}"
         /// </summary>
-        public const string GameStart = "hackathon/player";
+        public const string GameStarted = "hackathon/player";
 
         //{"id":"007","name":"James Bond","maxTries":3,"score":16}
         public const string ScoreUpdate = "hackathon/player/score";
