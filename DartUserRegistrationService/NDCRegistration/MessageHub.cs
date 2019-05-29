@@ -27,13 +27,11 @@ namespace NDCRegistration.Hubs
         }
         public async Task StartGame(Guid gamerId)
         {
-            var gamer = new Gamer
+            var gamer = new GamerMinimal
             {
                 Id = gamerId,
-                DisplayName = gamerId.ToString(),
-                FirstName = "Hello",
-                LastName = "World",
-                Email = "test@test.com"
+                Name = gamerId.ToString(),
+                MaxTries = 3
             };
             await Task.Run(() =>
             {

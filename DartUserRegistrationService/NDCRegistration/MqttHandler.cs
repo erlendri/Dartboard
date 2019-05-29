@@ -13,7 +13,7 @@ namespace NDCRegistration
     public interface IMqttHandler
     {
         Guid Id { get; set; }
-        void PostGameStart(Gamer gamer);
+        void PostGameStart(GamerMinimal gamer);
     }
     public class MqttHandler : IMqttHandler
     {
@@ -24,7 +24,7 @@ namespace NDCRegistration
             _hubContext = hubContext;
             var key = _config.GetValue<string>("MqttSettings:BrokerUri");
             _messageHandler = new MqttMessageHandler(key);
-            _messageHandler.Subscribe("HelloWorld");
+            _messageHandler.Subscribe(Topics.GameStart);
             _messageHandler.MqttMsgPublishReceived += _messageHandler_MqttMsgPublishReceived;
         }
 
@@ -33,14 +33,14 @@ namespace NDCRegistration
             var message = Encoding.Default.GetString(e.Message);
             Console.WriteLine($"Gamer received: {message}");
 
-            var wiredGamer = JsonConvert.DeserializeObject<Gamer>(message);
+            var wiredGamer = JsonConvert.DeserializeObject<GamerMinimal>(message);
 
             _hubContext.Clients.All.SendAsync("GameStarted", wiredGamer);
         }
 
-        public void PostGameStart(Gamer gamer)
+        public void PostGameStart(GamerMinimal gamer)
         {
-            _messageHandler.Publish("HelloWorld", gamer);
+            _messageHandler.Publish(Topics.GameStart, gamer);
         }
 
         private readonly IConfiguration _config;

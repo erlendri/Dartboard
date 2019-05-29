@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -21,5 +22,21 @@ namespace Dart.Messaging.Models
         [DisplayName("QrCode")]
         public string QrCode { get; set; }
 
+        public GamerMinimal ToMinimal()
+        {
+            return new GamerMinimal
+            {
+                Id = Id,
+                Name = DisplayName,
+                MaxTries = 3
+            };
+        }
+
+    }
+    public class GamerMinimal
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public int MaxTries { get; set; }
     }
 }

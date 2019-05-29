@@ -6,12 +6,26 @@ using System.Threading.Tasks;
 using Dart.Messaging.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using NDCRegistration.Hubs;
 using NDCRegistration.Models;
 
 namespace NDCRegistration.Controllers
 {
     public class RegistrationController : Controller
     {
+        private readonly IHubContext<MessageHub> HubContext;
+
+        public RegistrationController(IHubContext<MessageHub> hubContext)
+        {
+            HubContext = hubContext;
+        }
+        public IMqttHandler Handler { get; private set; }
+
+        public RegistrationController(IMqttHandler handler)
+        {
+            Handler = handler;
+        }
         public IActionResult Index()
         {
             return View();
