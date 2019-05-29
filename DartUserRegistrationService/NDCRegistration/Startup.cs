@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dart.Messaging.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NDCRegistration.Hubs;
+
 
 namespace NDCRegistration
 {
@@ -33,7 +36,10 @@ namespace NDCRegistration
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            //services.AddDbContext<EmployeeContext>(opts => opts.UseSqlServer(Configuration["ConnectionString:EmployeeDB"]));
+            services.AddDbContext<GamerContext>(opts =>
+            {
+                opts.UseSqlServer(Configuration["ConnectionString:GamerDB"]);
+            });
             
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
