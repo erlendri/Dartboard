@@ -11,33 +11,26 @@ namespace NDCRegistration
 {
     public static class MessageHubMethods
     {
-        internal async static Task SendGameAdded(IHubContext<MessageHub> hubContext, Gamer gamer)
+        internal async static Task SendGameUpdated(IHubContext<MessageHub> hubContext, Gamer gamer, int score)
         {
-            var signalRGame = new SignalRGame(gamer);
-            await hubContext.Clients.All.SendAsync(SignalRTopics.GameAdded, signalRGame);
+            var signalRGame = new SignalRGame(gamer.Id, gamer.DisplayName, score);
+            await hubContext.Clients.All.SendAsync(SignalRTopics.ScoreUpdate, signalRGame);
         }
-        internal async static Task SendGameUpdated(IHubContext<MessageHub> hubContext, Guid gamerId, int score)
-        {
-            var signalRGame = new SignalRGame(gamerId, score);
-            await hubContext.Clients.All.SendAsync(SignalRTopics.GameUpdated, signalRGame);
-        }
-        internal async static Task SendGameDeleted(IHubContext<MessageHub> hubContext, Guid gamerId)
-        {
-            await hubContext.Clients.All.SendAsync(SignalRTopics.GameDeleted, gamerId);
-        }
-        internal async static Task SendGameCompleted(IHubContext<MessageHub> hubContext, Guid gamerId, int score)
-        {
-            var signalRGame = new SignalRGame(gamerId, score);
-            await hubContext.Clients.All.SendAsync(SignalRTopics.GameCompleted, signalRGame);
-        }
-        internal async static Task SendAllPendingGames(IHubContext<MessageHub> hubContext, List<Gamer> gamers)
+        internal async static Task SendAllPendingGames(IHubContext<MessageHub> hubContext, List<Gamer> gamers, SignalRGame currentGame)
         {
             var games = gamers
                 .Where(f => f.Games.Any(st => st.State == GameState.Pending))
-                .Select(f => new SignalRGame(f)).ToList();
+                .Where(f => currentGame == null || currentGame.Id != f.Id)
+                .Select(f => new SignalRGame(f.Id, f.DisplayName)).ToList();
 
             await hubContext.Clients.All.SendAsync(SignalRTopics.GamesPending, games);
         }
+
+        internal async static Task SendCurrentGame(IHubContext<MessageHub> hubContext, SignalRGame currentGame)
+        {
+            await hubContext.Clients.All.SendAsync(SignalRTopics.GameCurrent, currentGame);
+        }
+
         internal async static Task SendAllCompletedGames(IHubContext<MessageHub> hubContext, List<Gamer> gamers)
         {
             var games = gamers
@@ -46,9 +39,9 @@ namespace NDCRegistration
                 {
                     var game = f.Games
                     .OrderByDescending(g => g.Score).First();
-                    return new SignalRGame(f, game.Score);
+                    return new SignalRGame(f.Id, f.DisplayName, game.Score);
                 })
-                .OrderByDescending(f=>f.Score).Take(30)
+                .OrderByDescending(f => f.Score).Take(30)
                 .ToList();
 
             await hubContext.Clients.All.SendAsync(SignalRTopics.GamesCompleted, games);

@@ -16,52 +16,54 @@ namespace ScoreboardTestBed
         {
             var client = new MqttMessageHandler("tpg-hackathon.westeurope.cloudapp.azure.com");
 
-            client.MqttMsgPublishReceived += PublishReceived;
+            client.MqttMsgPublishReceived += PublishReceived;            
+            client.Subscribe(Topics.ScoreUpdate);
 
-            var gamerId = Guid.NewGuid();
-            client.Subscribe(Topics.Gamer);
-
-            var packmanPlayer = new Gamer()
+            var gamerMini = new GamerMinimal
             {
-                Id = gamerId,
-                Email ="email@gamer.com",
-                FirstName="John",
-                LastName="Doe"
+                Id = Topics.TestId,
+                Name = "Hello world",
+                MaxTries = 3,
             };
+            var score = 123;
+            var random = new Random();
+            while (score != 0)
+            {
+                var key = Console.ReadLine();
+                gamerMini.Score = random.Next(200, 50000);
 
-            client.Publish<Gamer>(Topics.Gamer, packmanPlayer);
-            
-            client.Subscribe(Topics.Score);
+                client.Publish<GamerMinimal>(Topics.ScoreUpdate, gamerMini);
 
-            var score = new Score(gamerId, 1337);
-            client.Publish<Score>(Topics.Score, score);
-           
+            }
+
         }
 
         
 
         public static void PublishReceived(object sender, MqttMsgPublishEventArgs e)
         {
-            if (e.Topic == "/geopackman/Gamer")
-            {
-                var message = Encoding.Default.GetString(e.Message);
-                Console.WriteLine($"Gamer received: {message}");
+            //if (e.Topic == "/geopackman/Gamer")
+            //{
+            //    var message = Encoding.Default.GetString(e.Message);
+            //    Console.WriteLine($"Gamer received: {message}");
 
-                var wiredGamer = JsonConvert.DeserializeObject<Gamer>(message);
+            //    var wiredGamer = JsonConvert.DeserializeObject<Gamer>(message);
 
-                Console.WriteLine($"Email from transferred gamer: {wiredGamer.Email}");
-            }
-            else
-            {
-                var message = Encoding.Default.GetString(e.Message);
-                Console.WriteLine($"Score received: {message}");
+            //    Console.WriteLine($"Email from transferred gamer: {wiredGamer.Email}");
+            //}
+            //else
+            //{
+            //    var message = Encoding.Default.GetString(e.Message);
+            //    Console.WriteLine($"Score received: {message}");
 
-                var wiredScore = JsonConvert.DeserializeObject<Score>(message);
+            //    var wiredScore = JsonConvert.DeserializeObject<Score>(message);
 
-                Console.WriteLine($"Score for transferred gamer: {wiredScore.GameScore}");
-            }
-            Console.WriteLine("\n");
-           
+            //    Console.WriteLine($"Score for transferred gamer: {wiredScore.GameScore}");
+            //}
+            //Console.WriteLine("\n");
+            var message = Encoding.Default.GetString(e.Message);
+            Console.WriteLine($"Gamer received: {message}");
+
         }
     }
 }

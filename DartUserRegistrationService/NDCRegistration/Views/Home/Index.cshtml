@@ -55,28 +55,10 @@
 
 <h4>Currently playing</h4>
 <div id="player-current" class="section">
-  <div id="@(Guid.NewGuid())" class="player">
-    <div class="player-name">Player 1</div>
-    <div class="player-score">1234</div>
-    <div class="player-button-delete"></div>
-    <div class="player-button-start"></div>
-  </div>
 </div>
 <hr />
 <h4>Next</h4>
 <div id="player-next" class="section">
-  <div id="@(Guid.NewGuid())" class="player">
-    <div class="player-name">Player 2</div>
-    <div class="player-score"></div>
-    <div class="player-button-delete player-button"><span></span></div>
-    <div class="player-button-start player-button"><span></span></div>
-  </div>
-  <div id="@(Guid.NewGuid())" class="player">
-    <div class="player-name">Player 3</div>
-    <div class="player-score"></div>
-    <div class="player-button-delete player-button"><span></span></div>
-    <div class="player-button-start player-button"><span></span></div>
-  </div>
 </div>
 <template id="player-template">
   <div id="@(Guid.Empty)" class="player">
@@ -85,7 +67,6 @@
     <div class="player-button-delete player-button"><span></span></div>
     <div class="player-button-start player-button"><span></span></div>
   </div>
-
 </template>
 @section Scripts {
   @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
@@ -94,40 +75,58 @@
   <script src="~/js/message.js"></script>
   <script type="text/javascript">
     var connection = new signalR.HubConnectionBuilder().withUrl("/messageHub").build();
-    
-    connection.on("@(SignalRTopics.GameAdded)", function (game) {
-      console.log(game);
-      app.AddPlayerNext(game)
-      alert(`Game started for id ${game.id}`);
-    });
-    connection.on("@(SignalRTopics.GameCompleted)", function (game) {
-      console.log(game);
-      alert(`Game completed for id ${game.id}`);
-    });
-    connection.on("@(SignalRTopics.GameDeleted)", function (gamerId) {
-      console.log(gamerId);
-      alert(`Game completed for id ${gamerId}`);
-    });
+
     connection.on("@(SignalRTopics.ScoreUpdate)", function (game) {
-      console.log(game);
-      alert(`Score updated for id ${game.id} : ${game.score}`);
+      app.UpdatePlayerCurrent(game);
+    });
+    connection.on("@(SignalRTopics.GameCurrent)", function (game) {
+      if (game === undefined || game === null)
+        app.ClearPlayerCurrent();
+      else
+        app.UpdatePlayerCurrent(game);
+    });
+    connection.on("@(SignalRTopics.GamesPending)", function (games) {
+      app.ClearPlayerNext();
+      for (var i = 0; i < games.length; i++) {
+        app.AddPlayerNext(games[i]);
+      }
+    });
+    connection.on("@(SignalRTopics.GamesCompleted)", function (games) {
     });
 
     connection.start().then(function () {
       console.log('Ready to receive SignalR');
       app.Init();
-
+      hub.Sync();
     }).catch(function (err) {
       return console.error(err.toString());
     });
 
     let hub = {
+      Sync: () => {
+        hub.GetCurrentGame();
+        hub.GetPendingGames();
+        hub.GetCompletedGames();
+      },
       HelloServer: () => {
         connection.invoke('HelloServer');
       },
       StartGame: (id) => {
         connection.invoke('StartGame', id);
-      }
+      },
+      DeleteGame: (id) => {
+        connection.invoke('DeleteGame', id);
+      },
+      GetPendingGames: () => {
+        connection.invoke('GetPendingGames');
+      },
+      GetCompletedGames: () => {
+        connection.invoke('GetCompletedGames');
+      },
+      GetCurrentGame: () => {
+        connection.invoke('GetCurrentGame');
+      },
+
     }
 
   </script>
