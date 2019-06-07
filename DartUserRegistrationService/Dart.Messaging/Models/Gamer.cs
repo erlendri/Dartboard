@@ -26,6 +26,8 @@ namespace Dart.Messaging.Models
         [DisplayName("QrCode")]
         public string QrCode { get; set; }
 
+        public List<Game> Games { get; set; } = new List<Game>();
+
         public GamerMinimal ToMinimal()
         {
             return new GamerMinimal
@@ -35,7 +37,7 @@ namespace Dart.Messaging.Models
                 MaxTries = 3
             };
         }
-        public List<Game> Games { get; set; } = new List<Game>();
+       
     }
     public class GamerMinimal
     {

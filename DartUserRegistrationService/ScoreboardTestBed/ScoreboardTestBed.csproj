@@ -8,11 +8,13 @@
   <ItemGroup>
     <PackageReference Include="M2MqttDotnetCore" Version="1.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Dart.Messaging\Dart.Messaging.csproj" />
+    <ProjectReference Include="..\NDCRegistration\NDCRegistration.csproj" />
   </ItemGroup>
 
 </Project>
