@@ -6,6 +6,7 @@
         public const string GamesPending = "GamePending";
         public const string GamesCompleted = "GamesCompleted";
         public const string GameCurrent = "GameCurrent";
+        public const string UserLookup = "UserLookup";
 
     }
 }

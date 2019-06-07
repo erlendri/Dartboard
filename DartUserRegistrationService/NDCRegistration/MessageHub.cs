@@ -56,5 +56,12 @@ namespace NDCRegistration.Hubs
         {
             await MessageHubMethods.SendCurrentGame(_hubContext, _mqttHandler.GetCurrentGameAsSignalR);
         }
+        public async Task LookupQr(string qr)
+        {
+            var gamers = _gamerStorage.GetGamers();
+            var gamer = gamers.FirstOrDefault(f => f.QrCode == qr);
+            if (gamer != null)
+                await Clients.Caller.SendAsync(SignalRTopics.UserLookup, gamer);
+        }
     }
 }

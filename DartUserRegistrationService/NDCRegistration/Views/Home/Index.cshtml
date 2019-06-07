@@ -72,7 +72,6 @@
   @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
   <script src="~/lib/signalr/dist/browser/signalr.js"></script>
-  <script src="~/js/message.js"></script>
   <script type="text/javascript">
     var connection = new signalR.HubConnectionBuilder().withUrl("/messageHub").build();
 

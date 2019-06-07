@@ -56,96 +56,131 @@
 
 @section Scripts {
   @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
-<script type="text/javascript">
-  let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-  let qrcode = document.getElementById('qrCode');
-  scanner.addListener('scan', function (content) {
-    qrcode.value = content;
-    console.log(content);
-  });
-  Instascan.Camera.getCameras().then(function (cameras) {
-    let cameralist = document.getElementById("cameralist-content");
-    let cameralabel = document.getElementById("cameralist-label");
-    let cameracount = document.getElementById("camera-count");
-    cameracount.innerHTML = cameras.length.toString();
-    cameralabel.addEventListener('click', v => {
-      if (cameralist.classList.contains('hidden'))
-        cameralist.classList.remove('hidden');
-      else
-        cameralist.classList.add('hidden');
+
+  <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+  <script type="text/javascript">
+    var connection = new signalR.HubConnectionBuilder().withUrl("/messageHub").build();
+
+    connection.on("@(SignalRTopics.UserLookup)", function (gamer) {
+      SetFieldFromLookup(gamer.displayName, @(nameof(Model.DisplayName)));
+      SetFieldFromLookup(gamer.firstName, @(nameof(Model.FirstName)));
+      SetFieldFromLookup(gamer.lastName, @(nameof(Model.LastName)));
+      SetFieldFromLookup(gamer.email, @(nameof(Model.Email)));
     });
-    let preview = document.getElementById('preview');
-    cameralist.innerHTML = "";
-    if (cameras.length > 0) {
-      var cameraid = getCookie('camera-id');
-      if (isNaN(cameraid))
-        cameraid = "0";
 
-      for (var i = 0; i < cameras.length; i++) {
-        addCamera(formatName(cameras[i].name), cameralist, i);
+    connection.start().then(function () {
+      console.log('Ready to receive SignalR');
+    }).catch(function (err) {
+      return console.error(err.toString());
+    });
+    function SetFieldFromLookup(value, key) {
+      if (value == null)
+        return;
+      if (key.value.trim().length == 0) {
+        key.value = value;
       }
-      preview.classList.remove('hidden');
-      scanner.start(cameras[parseInt(cameraid)]);
+    }
+    let hub = {
+      LookupQr: (qr) => {
+        connection.invoke('LookupQr', qr);
+      },
+    }
 
-      cameralist.addEventListener('click', v => {
-        var target = v.target;
-        var id = target.getAttribute('data-id');
-        if (id === null || id === undefined)
-          return;
-        scanner.start(cameras[parseInt(id)]);
-        setCookie('camera-id', id, 10);
-        document.cookie = id;
-        cameralist.classList.add('hidden');
+    let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+    let qrcode = document.getElementById('qrCode');
+    qrcode.addEventListener('blur', () => {
+      if (qrcode.value.length > 0)
+        hub.LookupQr(qrcode.value);
+    });
+    scanner.addListener('scan', function (content) {
+      qrcode.value = content;
+      hub.LookupQr(qrcode.value);
+      console.log(content);
+    });
+    Instascan.Camera.getCameras().then(function (cameras) {
+      let cameralist = document.getElementById("cameralist-content");
+      let cameralabel = document.getElementById("cameralist-label");
+      let cameracount = document.getElementById("camera-count");
+      cameracount.innerHTML = cameras.length.toString();
+      cameralabel.addEventListener('click', v => {
+        if (cameralist.classList.contains('hidden'))
+          cameralist.classList.remove('hidden');
+        else
+          cameralist.classList.add('hidden');
       });
-    } else {
-      preview.classList.add('hidden');
-      addCameraError('No cameras found', cameralist);
-    }
-  }).catch(function (e) {
-    console.error(e);
-  });
-  function addCameraError(text, list) {
-    var div = document.createElement('div');
-    div.classList.add('camera-error');
-    div.innerHTML = text;
-    list.appendChild(div);
-  }
-  function addCamera(text, list, id) {
-    var li = document.createElement('li');
-    li.classList.add('select-none');
+      let preview = document.getElementById('preview');
+      cameralist.innerHTML = "";
+      if (cameras.length > 0) {
+        var cameraid = getCookie('camera-id');
+        if (isNaN(cameraid))
+          cameraid = "0";
 
-    var btn = document.createElement('input');
-    btn.type = 'button';
-    btn.value = text;
-    btn.classList.add('btn');
-    btn.classList.add('btn-primary');
-    btn.setAttribute('data-id', id.toString())
-    li.appendChild(btn);
-    list.appendChild(li);
-  }
-  function formatName(name) {
-    return name || '(unknown)';
-  }
-  function getCookie(cname) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-      var c = ca[i];
-      while (c.charAt(0) == ' ') {
-        c = c.substring(1);
+        for (var i = 0; i < cameras.length; i++) {
+          addCamera(formatName(cameras[i].name), cameralist, i);
+        }
+        preview.classList.remove('hidden');
+        scanner.start(cameras[parseInt(cameraid)]);
+
+        cameralist.addEventListener('click', v => {
+          var target = v.target;
+          var id = target.getAttribute('data-id');
+          if (id === null || id === undefined)
+            return;
+          scanner.start(cameras[parseInt(id)]);
+          setCookie('camera-id', id, 10);
+          document.cookie = id;
+          cameralist.classList.add('hidden');
+        });
+      } else {
+        preview.classList.add('hidden');
+        addCameraError('No cameras found', cameralist);
       }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
+    }).catch(function (e) {
+      console.error(e);
+    });
+    function addCameraError(text, list) {
+      var div = document.createElement('div');
+      div.classList.add('camera-error');
+      div.innerHTML = text;
+      list.appendChild(div);
     }
-    return "";
-  }
-  function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    var expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-  }
-</script>
+    function addCamera(text, list, id) {
+      var li = document.createElement('li');
+      li.classList.add('select-none');
+
+      var btn = document.createElement('input');
+      btn.type = 'button';
+      btn.value = text;
+      btn.classList.add('btn');
+      btn.classList.add('btn-primary');
+      btn.setAttribute('data-id', id.toString())
+      li.appendChild(btn);
+      list.appendChild(li);
+    }
+    function formatName(name) {
+      return name || '(unknown)';
+    }
+    function getCookie(cname) {
+      var name = cname + "=";
+      var decodedCookie = decodeURIComponent(document.cookie);
+      var ca = decodedCookie.split(';');
+      for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
+      }
+      return "";
+    }
+    function setCookie(cname, cvalue, exdays) {
+      var d = new Date();
+      d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+      var expires = "expires=" + d.toUTCString();
+      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+  </script>
+
+}
