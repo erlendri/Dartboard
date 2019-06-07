@@ -20,6 +20,7 @@ namespace Dart.Messaging.Models
         public Guid GamerId { get; set; }
         public int Score { get; set; }
         public GameState State { get; set; }
+        public DateTime DateCreated { get; set; }
 
     }
 }

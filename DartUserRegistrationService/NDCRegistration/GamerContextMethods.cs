@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dart.Messaging.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace NDCRegistration
@@ -28,14 +29,13 @@ namespace NDCRegistration
                 try
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
-                    var gamer = dbContext.Gamers.First(f => f.Id == gamerId);
+                    var gamer = dbContext.Gamers
+                        .First(f => f.Id == gamerId);
                     var game = new Game
                     {
-                        GamerId = gamer.Id,
-                        Id = Guid.NewGuid(),
                         Score = 0,
-                        State = GameState.Pending
-
+                        State = GameState.Pending,
+                        DateCreated = DateTime.Now
                     };
                     gamer.Games.Add(game);
                     dbContext.SaveChanges();
@@ -56,17 +56,28 @@ namespace NDCRegistration
                 {
 
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
-                    var existing = dbContext.Gamers.FirstOrDefault(f =>
+                    var existing = dbContext.Gamers
+                        .Include(f => f.Games)
+                        .FirstOrDefault(f =>
             (!string.IsNullOrWhiteSpace(gamer.QrCode) && f.QrCode == gamer.QrCode) ||
             (!string.IsNullOrWhiteSpace(gamer.Email) && f.Email == gamer.Email));
 
                     if (existing != null)
                     {
+                        var existingGames = existing.Games
+                            .Where(f => f.State == GameState.Pending)
+                            .ToList();
+
+                        existingGames.Where(f=>f.Score > 0).ToList()
+                        .ForEach(f => f.State = GameState.Completed);
+                        existingGames.Where(f => f.Score <= 0).ToList()
+                        .ForEach(f => f.State = GameState.Deleted);
+
                         UpdateGamerEntity(existing, gamer);
+                        gamer.Id = existing.Id;
                     }
                     else
                     {
-                        gamer.Id = Guid.NewGuid();
                         dbContext.Gamers.Add(gamer);
                     }
                     dbContext.SaveChanges();
@@ -101,6 +112,7 @@ namespace NDCRegistration
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
                     var game = dbContext.Gamers
+                        .Include(f => f.Games)
                         .SelectMany(f => f.Games)
                         .FirstOrDefault(f => f.Id == gameId);
                     if (game != null)
@@ -129,6 +141,7 @@ namespace NDCRegistration
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
                     var gamer =
                         dbContext.Gamers
+                        .Include(f => f.Games)
                         .First(f => f.Id == id);
 
                     return gamer;
@@ -150,9 +163,10 @@ namespace NDCRegistration
 
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
                     var gamersTest = dbContext.Gamers.ToList();
-                    var gamers = 
+                    var gamers =
                         dbContext.Gamers
-                        .Where(f=>f.Games.Any())
+                        .Include(f => f.Games)
+                        .Where(f => f.Games.Any())
                         .ToList();
 
                     return gamers;
@@ -168,6 +182,31 @@ namespace NDCRegistration
         public void UpdateGameScore(Guid gameId, int score)
         {
             UpdateGameState(gameId, GameState.Pending, score);
+        }
+
+        public Game GetGamerLastPendingGame(Guid gamerId)
+        {
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                try
+                {
+
+                    var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
+                    var game =
+                        dbContext.Games
+                        .Where(f => f.GamerId == gamerId)
+                        .Where(f => f.State == GameState.Pending)
+                        .OrderByDescending(f => f.DateCreated)
+                        .FirstOrDefault();
+
+                    return game;
+                }
+                catch (Exception ex)
+                {
+                    var msg = ex.ToString();
+                    throw;
+                }
+            }
         }
     }
 }

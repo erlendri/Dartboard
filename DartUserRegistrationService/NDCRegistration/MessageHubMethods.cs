@@ -21,6 +21,7 @@ namespace NDCRegistration
             var games = gamers
                 .Where(f => f.Games.Any(st => st.State == GameState.Pending))
                 .Where(f => currentGame == null || currentGame.Id != f.Id)
+                .OrderBy(f=>f.Games.Where(g=>g.State == GameState.Pending).Max(g=>g.DateCreated))
                 .Select(f => new SignalRGame(f.Id, f.DisplayName)).ToList();
 
             await hubContext.Clients.All.SendAsync(SignalRTopics.GamesPending, games);

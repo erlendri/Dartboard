@@ -41,7 +41,9 @@ namespace NDCRegistration
             var gamers = _gamerStorage.GetGamers();
             if (CurrentGame != null)
             {
-                var currentGamer = gamers.FirstOrDefault(f => f.Id == CurrentGame.Id);
+                var currentGame = gamers.SelectMany(f => f.Games).FirstOrDefault(g=>g.Id == CurrentGame.Id);
+                if (currentGame != null && currentGame.State != GameState.Pending)
+                    CurrentGame = null;
             }
             MessageHubMethods.SendCurrentGame(_hubContext, GetCurrentGameAsSignalR).Wait();
             MessageHubMethods.SendAllPendingGames(_hubContext, gamers, GetCurrentGameAsSignalR).Wait();
@@ -56,17 +58,18 @@ namespace NDCRegistration
                 if (game == null)
                     return;
                 _gamerStorage.UpdateGameScore(game.Id, gamer.Score);
-
-                SetCurrentGame(gamer.Id, gamer.Score, stored.DisplayName);
+                game.Score = gamer.Score;
+                SetCurrentGame(game);
                 MessageHubMethods.SendGameUpdated(_hubContext, stored, gamer.Score).Wait();
             }
             else if (e.Topic == Topics.GameCompleted)
             {
                 GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
-                if (game == null)
-                    return;
-                game.Score = gamer.Score;
-                _gamerStorage.CompleteGame(game);
+                if (game != null)
+                {
+                    game.Score = gamer.Score;
+                    _gamerStorage.CompleteGame(game);
+                }
                 CurrentGame = null;
                 SyncClientGames();
 
@@ -74,25 +77,22 @@ namespace NDCRegistration
             else if (e.Topic == Topics.GameAborted)
             {
                 GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
-                if (game == null)
-                    return;
-                _gamerStorage.DeleteGame(game.Id);
+                if (game != null)
+                {
+                    _gamerStorage.DeleteGame(game.Id);
+                }
                 CurrentGame = null;
                 SyncClientGames();
             }
 
         }
 
-        private void SetCurrentGame(Guid id, int score, string name)
+        private void SetCurrentGame(Game game)
         {
-            if (CurrentGame != null && CurrentGame.Id != id)
+            if (CurrentGame != null && CurrentGame.Id != game.Id)
             {
-                var prevPlayer = _gamerStorage.GetGamer(CurrentGame.Id);
-                prevPlayer.Games
-                    .Where(F => F.State == GameState.Pending)
-                    .ToList().ForEach(f => _gamerStorage.DeleteGame(f.Id));
+                _gamerStorage.DeleteGame(CurrentGame.Id);
             }
-            var game = _gamerStorage.GetGamer(id).Games.LastOrDefault(f => f.State == GameState.Pending);
             if (game == null)
                 CurrentGame = null;
             else
@@ -108,8 +108,8 @@ namespace NDCRegistration
 
         public void PostGameStarted(GamerMinimal gamer)
         {
-            var store = _gamerStorage.GetGamer(gamer.Id);
-            SetCurrentGame(store.Id, 0, store.DisplayName);
+            var game = _gamerStorage.GetGamerLastPendingGame(gamer.Id);
+            SetCurrentGame(game);
             SyncClientGames();
             _messageHandler.Publish(Topics.GameStarted, gamer);
         }
@@ -127,6 +127,8 @@ namespace NDCRegistration
 
         private SignalRGame GameToSignalR(Game currentGame)
         {
+            if (currentGame == null)
+                return null;
             var gamer = _gamerStorage.GetGamer(currentGame.GamerId);
             return new SignalRGame(gamer.Id, gamer.DisplayName, currentGame.Score);
         }

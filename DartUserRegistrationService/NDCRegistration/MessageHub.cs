@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.SignalR;
 using NDCRegistration.MessageHubModels;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace NDCRegistration.Hubs
@@ -19,7 +20,7 @@ namespace NDCRegistration.Hubs
             _mqttHandler = mqttHandler;
             _gamerStorage = gamerStorage;
             _hubContext = context;
-            
+
         }
         public async Task StartGame(Guid id)
         {
@@ -31,7 +32,9 @@ namespace NDCRegistration.Hubs
         }
         public async Task DeleteGame(Guid id)
         {
-            _gamerStorage.DeleteGame(id);
+            var game = _gamerStorage.GetGamerLastPendingGame(id);
+            if (game != null)
+                _gamerStorage.DeleteGame(game.Id);
             await Task.Run(() =>
             {
                 _mqttHandler.SyncClientGames();

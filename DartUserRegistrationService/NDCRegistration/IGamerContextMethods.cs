@@ -12,7 +12,8 @@ namespace NDCRegistration
         List<Gamer> GetGamers();
         Game CreateGame(Guid gamerId);
         void CompleteGame(Game game);
-        void DeleteGame(Guid id);
-        void UpdateGameScore(Guid id, int score);
+        void DeleteGame(Guid gameId);
+        void UpdateGameScore(Guid gameId, int score);
+        Game GetGamerLastPendingGame(Guid gamerId);
     }
 }
