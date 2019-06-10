@@ -36,12 +36,8 @@ namespace NDCRegistration
         {
             var games = gamers
                 .Where(f => f.Games.Any(st => st.State == GameState.Completed))
-                .Select(f =>
-                {
-                    var game = f.Games
-                    .OrderByDescending(g => g.Score).First();
-                    return new SignalRGame(f.Id, f.DisplayName, game.Score);
-                })
+                .GroupBy(f=>f.Id)
+                .Select(f=>new SignalRGame(f.Key, f.Max(g=>g.DisplayName), f.SelectMany(g=>g.Games).Where(h=>h.State == GameState.Completed).Max(h=>h.Score)))
                 .OrderByDescending(f => f.Score).Take(30)
                 .ToList();
 
