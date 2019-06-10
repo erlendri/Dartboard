@@ -92,11 +92,15 @@ body {
 }
 
 /* Hide/rearrange for smaller screens */
-/*@media screen and (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .carousel-caption {
-        display: none;
+        padding-top: 0px;
+        padding-bottom: 0px;
     }
-}*/
+    .carousel-indicators{
+        display:none;
+    }
+}
 
 .player {
     border-radius: 15px;
