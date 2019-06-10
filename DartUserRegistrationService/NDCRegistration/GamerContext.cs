@@ -8,6 +8,7 @@ namespace NDCRegistration
         public GamerContext(DbContextOptions options)
             : base(options)
         {
+            Database.Migrate();
         }
 
         public DbSet<Gamer> Gamers { get; set; }

@@ -16,7 +16,7 @@ namespace ScoreboardTestBed
     {
         static void Main(string[] args)
         {
-            MqttTests();
+            //MqttTests();
 
             DatabaseTests();
 
@@ -24,7 +24,7 @@ namespace ScoreboardTestBed
 
         private static void MqttTests()
         {
-            var client = new MqttMessageHandler("tpg-hackathon.westeurope.cloudapp.azure.com");
+            var client = new MqttMessageHandler("tpg-hackathon.westeurope.cloudapp.azure.com");//new MqttMessageHandler("169.254.151.119");
 
             client.MqttMsgPublishReceived += PublishReceived;
 
@@ -50,23 +50,23 @@ namespace ScoreboardTestBed
         private static void DatabaseTests()
         {
             DbContextOptionsBuilder<GamerContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<GamerContext>();
-            dbContextOptionsBuilder.UseSqlServer("Data Source = ndcregistrationdbserver.database.windows.net; Initial Catalog = NDCRegistration_db; User ID = TeleplanNDC; Password = ThreeLittlePigs3; Connect Timeout = 60; Encrypt = True; TrustServerCertificate = False; ApplicationIntent = ReadWrite; MultiSubnetFailover = False");
+            dbContextOptionsBuilder.UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=NDCRegistration_db;Trusted_Connection=True;");//"Data Source = ndcregistrationdbserver.database.windows.net; Initial Catalog = NDCRegistration_db; User ID = TeleplanNDC; Password = ThreeLittlePigs3; Connect Timeout = 60; Encrypt = True; TrustServerCertificate = False; ApplicationIntent = ReadWrite; MultiSubnetFailover = False");
             var gamerContext = new GamerContext(dbContextOptionsBuilder.Options);
-
+           // gamerContext.Database.Migrate();
             LiveGamerStorage gamerStorage = new LiveGamerStorage(gamerContext);
 
             var packmanPlayer2 = new Gamer()
             {
-                Email = "email@gamer.com",
-                DisplayName = "Tetris",
-                FirstName = "John",
-                LastName = "Doe"
+                Email = "Michael@gamer.com",
+                DisplayName = "Moonwalker",
+                FirstName = "Michael",
+                LastName = "Jackson"
             };
             var createdGamer = gamerStorage.CreateOrUpdateGamer(packmanPlayer2);
             var game = new Game()
             {
                 GamerId = createdGamer.Id,
-                Score = 34,
+                Score = 1337,
                 State = GameState.Pending
             };
 
@@ -74,7 +74,7 @@ namespace ScoreboardTestBed
 
 
             gamerStorage.CompleteGame(createdGame);
-            Console.Read();
+            //Console.Read();
             gamerStorage.DeleteGame(createdGame.Id);
         }
 
