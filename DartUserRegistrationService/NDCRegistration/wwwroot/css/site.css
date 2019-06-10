@@ -13,10 +13,10 @@ body {
 }
 
 /* Carousel */
-.carousel-caption p {
+/*.carousel-caption p {
     font-size: 20px;
     line-height: 1.4;
-}
+}*/
 
 /* Make .svg files in the carousel display properly in older browsers */
 .carousel-inner .item img[src$=".svg"] {
@@ -90,17 +90,13 @@ body {
     -ms-user-select: none;
     user-select: none;
 }
-
-/* Hide/rearrange for smaller screens */
-@media screen and (max-width: 767px) {
-    .carousel-caption {
-        padding-top: 0px;
-        padding-bottom: 0px;
-    }
-    .carousel-indicators{
-        display:none;
-    }
+.carousel-caption {
+    padding-top: 0px;
+    padding-bottom: 50px;
+    height: 100%;
+    bottom: 0px;
 }
+
 
 .player {
     border-radius: 15px;
@@ -130,9 +126,11 @@ body {
     }
 
 .highscore-container-wrapper {
+    height: 100%;
     display: grid;
     grid-template: "left right" auto/50% 50%;
     grid-gap: 25px;
+    align-content: center;
 }
 
 .highscore-container {
@@ -147,6 +145,7 @@ body {
     grid-template: "rank name score" auto/15px auto 50px;
     white-space: nowrap;
     width: 100%;
+    padding: 15px 7px 15px 5px;
 }
 
     .player-highscore .player-name {
@@ -159,6 +158,26 @@ body {
     .player-highscore .player-score {
         text-align: right;
     }
+
+/* Hide/rearrange for smaller screens */
+@media screen and (max-width: 767px) {
+    .carousel-caption {
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
+
+    .carousel-indicators {
+        display: none;
+    }
+    .highscore-container-wrapper {
+        grid-gap: 5px;
+    }
+
+    .player-highscore {
+        padding: 2px 1px 2px 1px;
+    }
+}
+
 
 #player-current,
 #player-next {
