@@ -92,12 +92,11 @@ body {
 }
 
 /* Hide/rearrange for smaller screens */
-@media screen and (max-width: 767px) {
-    /* Hide captions */
+/*@media screen and (max-width: 767px) {
     .carousel-caption {
         display: none;
     }
-}
+}*/
 
 .player {
     border-radius: 15px;
@@ -128,7 +127,8 @@ body {
 
 .highscore-container-wrapper {
     display: grid;
-    grid-template: "left right" 120px/50% 50%;
+    grid-template: "left right" auto/50% 50%;
+    grid-gap: 25px;
 }
 
 .highscore-container {
