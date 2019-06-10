@@ -1,4 +1,5 @@
-﻿using Dart.Messaging.Models;
+﻿using Dart.Messaging;
+using Dart.Messaging.Models;
 using Microsoft.AspNetCore.SignalR;
 using NDCRegistration.MessageHubModels;
 using System;
@@ -62,6 +63,33 @@ namespace NDCRegistration.Hubs
             var gamer = gamers.FirstOrDefault(f => f.QrCode == qr);
             if (gamer != null)
                 await Clients.Caller.SendAsync(SignalRTopics.UserLookup, gamer);
+        }
+        public async Task TestUpdateCurrent()
+        {
+            await Task.Run(() =>
+            {
+                var currentGame = _mqttHandler.GameToSignalR(_mqttHandler.CurrentGame, out Gamer gamer);
+                if (currentGame == null)
+                    return;
+                var gamerMini = gamer.ToMinimal();
+                gamerMini.Score = new Random().Next(100) + currentGame.Score;
+                _mqttHandler.PostCustom(Topics.ScoreUpdate, gamerMini);
+            });
+
+        }
+        public async Task TestCompleteGame()
+        {
+            await Task.Run(() =>
+            {
+                var currentGame = _mqttHandler.GameToSignalR(_mqttHandler.CurrentGame, out Gamer gamer);
+                if (currentGame == null)
+                    return;
+                var gamerMini = gamer.ToMinimal();
+                gamerMini.Score = new Random().Next(100) + currentGame.Score;
+                gamerMini.MaxTries = 0;
+                _mqttHandler.PostCustom(Topics.ScoreUpdate, gamerMini);
+            });
+
         }
     }
 }

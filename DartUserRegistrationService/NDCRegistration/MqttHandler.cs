@@ -19,6 +19,8 @@ namespace NDCRegistration
         Game CurrentGame { get; }
         SignalRGame GetCurrentGameAsSignalR { get; }
         void SyncClientGames();
+        void PostCustom(string topic, object obj);
+        SignalRGame GameToSignalR(Game currentGame, out Gamer gamer);
     }
     public class MqttHandler : IMqttHandler
     {
@@ -41,7 +43,7 @@ namespace NDCRegistration
             var gamers = _gamerStorage.GetGamers();
             if (CurrentGame != null)
             {
-                var currentGame = gamers.SelectMany(f => f.Games).FirstOrDefault(g=>g.Id == CurrentGame.Id);
+                var currentGame = gamers.SelectMany(f => f.Games).FirstOrDefault(g => g.Id == CurrentGame.Id);
                 if (currentGame != null && currentGame.State != GameState.Pending)
                     CurrentGame = null;
             }
@@ -59,19 +61,19 @@ namespace NDCRegistration
                     return;
                 _gamerStorage.UpdateGameScore(game.Id, gamer.Score);
                 game.Score = gamer.Score;
-                SetCurrentGame(game);
-                MessageHubMethods.SendGameUpdated(_hubContext, stored, gamer.Score).Wait();
+                if (gamer.MaxTries <= 0)
+                    CompleteGame(gamer, game);
+                else
+                {
+
+                    SetCurrentGame(game);
+                    MessageHubMethods.SendGameUpdated(_hubContext, stored, gamer.Score).Wait();
+                }
             }
             else if (e.Topic == Topics.GameCompleted)
             {
                 GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
-                if (game != null)
-                {
-                    game.Score = gamer.Score;
-                    _gamerStorage.CompleteGame(game);
-                }
-                CurrentGame = null;
-                SyncClientGames();
+                CompleteGame(gamer, game);
 
             }
             else if (e.Topic == Topics.GameAborted)
@@ -85,6 +87,17 @@ namespace NDCRegistration
                 SyncClientGames();
             }
 
+        }
+
+        private void CompleteGame(GamerMinimal gamer, Game game)
+        {
+            if (game != null)
+            {
+                game.Score = gamer.Score;
+                _gamerStorage.CompleteGame(game);
+            }
+            CurrentGame = null;
+            SyncClientGames();
         }
 
         private void SetCurrentGame(Game game)
@@ -103,12 +116,17 @@ namespace NDCRegistration
         {
             gamer = JsonConvert.DeserializeObject<GamerMinimal>(message);
             stored = _gamerStorage.GetGamer(gamer.Id);
-            game = stored.Games.LastOrDefault(f => f.State == GameState.Pending);
+            game = stored.Games.OrderByDescending(g=>g.DateCreated).First(g=>g.State == GameState.Pending);
         }
 
         public void PostGameStarted(GamerMinimal gamer)
         {
             var game = _gamerStorage.GetGamerLastPendingGame(gamer.Id);
+            if (game.Score > 0)
+            {
+                _gamerStorage.CompleteGame(game);
+                game = _gamerStorage.CreateGame(game.GamerId);
+            }
             SetCurrentGame(game);
             SyncClientGames();
             _messageHandler.Publish(Topics.GameStarted, gamer);
@@ -125,12 +143,24 @@ namespace NDCRegistration
 
         public SignalRGame GetCurrentGameAsSignalR => GameToSignalR(CurrentGame);
 
-        private SignalRGame GameToSignalR(Game currentGame)
+        public SignalRGame GameToSignalR(Game currentGame)
         {
             if (currentGame == null)
                 return null;
             var gamer = _gamerStorage.GetGamer(currentGame.GamerId);
             return new SignalRGame(gamer.Id, gamer.DisplayName, currentGame.Score);
+        }
+        public SignalRGame GameToSignalR(Game currentGame, out Gamer gamer)
+        {
+            gamer = null;
+            if (currentGame == null)
+                return null;
+            gamer = _gamerStorage.GetGamer(currentGame.GamerId);
+            return new SignalRGame(gamer.Id, gamer.DisplayName, currentGame.Score);
+        }
+        public void PostCustom(string topic, object obj)
+        {
+            _messageHandler.Publish(topic, obj);
         }
     }
 
