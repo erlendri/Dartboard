@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.SignalR;
 using NDCRegistration.MessageHubModels;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace NDCRegistration.Hubs
@@ -10,14 +11,16 @@ namespace NDCRegistration.Hubs
     {
         public Guid Id { get; }
         private readonly IMqttHandler _mqttHandler;
-        private readonly IGamerStorage _gamerStorage;
+        private readonly IGamerContextMethods _gamerStorage;
+        private readonly IHubContext<MessageHub> _hubContext;
 
-        public MessageHub(IMqttHandler mqttHandler, IGamerStorage gamerStorage)
+        public MessageHub(IMqttHandler mqttHandler, IGamerContextMethods gamerStorage, IHubContext<MessageHub> context)
         {
             Id = Guid.NewGuid();
             _mqttHandler = mqttHandler;
             _gamerStorage = gamerStorage;
-            
+            _hubContext = context;
+
         }
         public async Task StartGame(Guid id)
         {
@@ -29,9 +32,36 @@ namespace NDCRegistration.Hubs
         }
         public async Task DeleteGame(Guid id)
         {
-            _gamerStorage.DeleteGame(id);
-            await MessageHubMethods.SendGameDeleted((IHubContext<MessageHub>)Context, id);
+            var game = _gamerStorage.GetGamerLastPendingGame(id);
+            if (game != null)
+                _gamerStorage.DeleteGame(game.Id);
+            await Task.Run(() =>
+            {
+                _mqttHandler.SyncClientGames();
+            });
 
+        }
+        public async Task GetPendingGames()
+        {
+            var gamers = _gamerStorage.GetGamers();
+            await MessageHubMethods.SendAllPendingGames(_hubContext, gamers, _mqttHandler.GetCurrentGameAsSignalR);
+
+        }
+        public async Task GetCompletedGames()
+        {
+            var gamers = _gamerStorage.GetGamers();
+            await MessageHubMethods.SendAllCompletedGames(_hubContext, gamers);
+        }
+        public async Task GetCurrentGame()
+        {
+            await MessageHubMethods.SendCurrentGame(_hubContext, _mqttHandler.GetCurrentGameAsSignalR);
+        }
+        public async Task LookupQr(string qr)
+        {
+            var gamers = _gamerStorage.GetGamers();
+            var gamer = gamers.FirstOrDefault(f => f.QrCode == qr);
+            if (gamer != null)
+                await Clients.Caller.SendAsync(SignalRTopics.UserLookup, gamer);
         }
     }
 }

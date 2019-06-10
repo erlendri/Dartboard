@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace NDCRegistration
 {
-    public class LiveGamerStorage : IGamerStorage
+    public class LiveGamerStorage : IGamerContextMethods
     {
         private GamerContext gamerContext;
 
@@ -34,6 +34,11 @@ namespace NDCRegistration
             gamerContext.SaveChanges();
 
             return createdGame;
+        }
+
+        public Game CreateGame(Guid gamerId)
+        {
+            throw new NotImplementedException();
         }
 
         public Gamer CreateOrUpdateGamer(Gamer gamer)
@@ -77,9 +82,19 @@ namespace NDCRegistration
             return gamerContext.Gamers.First(f => f.Id == id);
         }
 
+        public Game GetGamerLastPendingGame(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
         public List<Gamer> GetGamers()
         {
             return gamerContext.Gamers.ToList();
+        }
+
+        public void UpdateGameScore(Guid id, int score)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -17,13 +17,13 @@ namespace Dart.Messaging
     public class MqttMessageHandler : IMessageHandler
     {
         private MqttClient myClient;
-
+        private string _clientId;
         public MqttMessageHandler(string uri)
         {
             myClient = new MqttClient(uri);
 
-            string clientId = Guid.NewGuid().ToString();
-            myClient.Connect(clientId);
+            _clientId = Guid.NewGuid().ToString();
+            myClient.Connect(_clientId);
         }
 
 
@@ -43,6 +43,8 @@ namespace Dart.Messaging
 
         public void Publish<T>(string topic, T payload)
         {
+            if (!myClient.IsConnected)
+                myClient.Connect(_clientId);
             var serializedPayload = JsonConvert.SerializeObject(payload);
             myClient.Publish(topic, Encoding.UTF8.GetBytes(serializedPayload), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
         }

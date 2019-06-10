@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using NDCRegistration.Hubs;
+using NDCRegistration.MessageHubModels;
 using Newtonsoft.Json;
 using System;
 using System.Linq;
@@ -15,10 +16,13 @@ namespace NDCRegistration
     {
         Guid Id { get; set; }
         void PostGameStarted(GamerMinimal gamer);
+        Game CurrentGame { get; }
+        SignalRGame GetCurrentGameAsSignalR { get; }
+        void SyncClientGames();
     }
     public class MqttHandler : IMqttHandler
     {
-        public MqttHandler(IConfiguration config, IHubContext<MessageHub> hubContext, IGamerStorage gamerStorage)
+        public MqttHandler(IConfiguration config, IHubContext<MessageHub> hubContext, IGamerContextMethods gamerStorage)
         {
             Id = Guid.NewGuid();
             _config = config;
@@ -29,57 +33,105 @@ namespace NDCRegistration
             _messageHandler.Subscribe(Topics.GameCompleted);
             _messageHandler.Subscribe(Topics.GameAborted);
             _messageHandler.Subscribe(Topics.ScoreUpdate);
+            //_messageHandler.Subscribe(Topics.GameStarted);
             _messageHandler.MqttMsgPublishReceived += _messageHandler_MqttMsgPublishReceived;
         }
-
+        public void SyncClientGames()
+        {
+            var gamers = _gamerStorage.GetGamers();
+            if (CurrentGame != null)
+            {
+                var currentGame = gamers.SelectMany(f => f.Games).FirstOrDefault(g=>g.Id == CurrentGame.Id);
+                if (currentGame != null && currentGame.State != GameState.Pending)
+                    CurrentGame = null;
+            }
+            MessageHubMethods.SendCurrentGame(_hubContext, GetCurrentGameAsSignalR).Wait();
+            MessageHubMethods.SendAllPendingGames(_hubContext, gamers, GetCurrentGameAsSignalR).Wait();
+            MessageHubMethods.SendAllCompletedGames(_hubContext, gamers).Wait();
+        }
         private void _messageHandler_MqttMsgPublishReceived(object sender, uPLibrary.Networking.M2Mqtt.Messages.MqttMsgPublishEventArgs e)
         {
             var message = Encoding.Default.GetString(e.Message);
             if (e.Topic == Topics.ScoreUpdate)
             {
-                var gamer = JsonConvert.DeserializeObject<GamerMinimal>(message);
-                MessageHubMethods.SendGameUpdated(_hubContext, gamer.Id, gamer.Score).Wait();
+                GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
+                if (game == null)
+                    return;
+                _gamerStorage.UpdateGameScore(game.Id, gamer.Score);
+                game.Score = gamer.Score;
+                SetCurrentGame(game);
+                MessageHubMethods.SendGameUpdated(_hubContext, stored, gamer.Score).Wait();
             }
             else if (e.Topic == Topics.GameCompleted)
             {
                 GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
-                if (game == null)
-                    return;
-                game.Score = gamer.Score;
-                _gamerStorage.CompleteGame(game);
-                MessageHubMethods.SendGameCompleted(_hubContext, gamer.Id, gamer.Score).Wait();
+                if (game != null)
+                {
+                    game.Score = gamer.Score;
+                    _gamerStorage.CompleteGame(game);
+                }
+                CurrentGame = null;
+                SyncClientGames();
 
             }
             else if (e.Topic == Topics.GameAborted)
             {
                 GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
-                if (game == null)
-                    return;
-                _gamerStorage.DeleteGame(game.Id);
-                MessageHubMethods.SendGameDeleted(_hubContext, game.Id).Wait();
+                if (game != null)
+                {
+                    _gamerStorage.DeleteGame(game.Id);
+                }
+                CurrentGame = null;
+                SyncClientGames();
             }
 
-            Console.WriteLine($"Gamer received: {message}");
-
         }
+
+        private void SetCurrentGame(Game game)
+        {
+            if (CurrentGame != null && CurrentGame.Id != game.Id)
+            {
+                _gamerStorage.DeleteGame(CurrentGame.Id);
+            }
+            if (game == null)
+                CurrentGame = null;
+            else
+                CurrentGame = game;
+        }
+
         private void GetGamerFromMessage(string message, out GamerMinimal gamer, out Gamer stored, out Game game)
         {
             gamer = JsonConvert.DeserializeObject<GamerMinimal>(message);
             stored = _gamerStorage.GetGamer(gamer.Id);
-            game = stored.Games.OrderByDescending(f => f.Id).FirstOrDefault(f => f.State == GameState.Pending);
+            game = stored.Games.LastOrDefault(f => f.State == GameState.Pending);
         }
 
         public void PostGameStarted(GamerMinimal gamer)
         {
+            var game = _gamerStorage.GetGamerLastPendingGame(gamer.Id);
+            SetCurrentGame(game);
+            SyncClientGames();
             _messageHandler.Publish(Topics.GameStarted, gamer);
         }
 
         private readonly IConfiguration _config;
         private readonly IHubContext<MessageHub> _hubContext;
-        private readonly IGamerStorage _gamerStorage;
+        private readonly IGamerContextMethods _gamerStorage;
         private readonly MqttMessageHandler _messageHandler;
 
         public Guid Id { get; set; }
+
+        public Game CurrentGame { get; set; }
+
+        public SignalRGame GetCurrentGameAsSignalR => GameToSignalR(CurrentGame);
+
+        private SignalRGame GameToSignalR(Game currentGame)
+        {
+            if (currentGame == null)
+                return null;
+            var gamer = _gamerStorage.GetGamer(currentGame.GamerId);
+            return new SignalRGame(gamer.Id, gamer.DisplayName, currentGame.Score);
+        }
     }
 
 }
