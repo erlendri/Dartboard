@@ -10,8 +10,8 @@ using NDCRegistration;
 namespace NDCRegistration.Migrations
 {
     [DbContext(typeof(GamerContext))]
-    [Migration("20190529205051_NDCRegistration.GamerContext4")]
-    partial class NDCRegistrationGamerContext4
+    [Migration("20190604211134_AddGamingDatabase")]
+    partial class AddGamingDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
