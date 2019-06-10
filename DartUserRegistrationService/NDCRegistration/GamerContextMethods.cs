@@ -1,29 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Dart.Messaging.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace NDCRegistration
 {
     public class GamerContextMethods : IGamerContextMethods
     {
         private readonly IServiceScopeFactory _scopeFactory;
+        private ILogger _logger;
 
-        public GamerContextMethods(IServiceScopeFactory scopeFactory)
+        public GamerContextMethods(IServiceScopeFactory scopeFactory, ILogger<GamerContextMethods> logger)
         {
             _scopeFactory = scopeFactory;
+            _logger = logger;
         }
+
 
         public void CompleteGame(Game game)
         {
             UpdateGameState(game.Id, GameState.Completed, game.Score);
         }
 
+
         public Game CreateGame(Guid gamerId)
         {
-
+            Game game = null;
+            
             using (var scope = _scopeFactory.CreateScope())
             {
                 try
@@ -31,30 +38,33 @@ namespace NDCRegistration
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
                     var gamer = dbContext.Gamers
                         .First(f => f.Id == gamerId);
-                    var game = new Game
+                    game = new Game
                     {
-                        Score = 0,
+                        Score = 0,                        
                         State = GameState.Pending,
                         DateCreated = DateTime.Now
                     };
                     gamer.Games.Add(game);
                     dbContext.SaveChanges();
-                    return game;
+                    _logger.LogInformation($"Game created: {game.GamerId}");
                 }
                 catch (Exception ex)
                 {
-                    throw;
+                    _logger.LogWarning(ex.Message);
                 }
             }
+            return game;
         }
+
 
         public Gamer CreateOrUpdateGamer(Gamer gamer)
         {
+            Gamer modifiedGamer = null;
+
             using (var scope = _scopeFactory.CreateScope())
             {
                 try
                 {
-
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
                     var existing = dbContext.Gamers
                         .Include(f => f.Games)
@@ -75,21 +85,23 @@ namespace NDCRegistration
 
                         UpdateGamerEntity(existing, gamer);
                         gamer.Id = existing.Id;
+                        modifiedGamer = gamer;
                     }
                     else
                     {
-                        dbContext.Gamers.Add(gamer);
+                       modifiedGamer =  dbContext.Gamers.Add(gamer).Entity;
                     }
-                    dbContext.SaveChanges();
-                    return gamer;
+                    dbContext.SaveChanges();  
                 }
                 catch (Exception ex)
                 {
-                    throw;
+                    _logger.LogWarning(ex.Message);
                 }
             }
-
+            _logger.LogInformation($"Gamer created or modified: {modifiedGamer.DisplayName}");
+            return modifiedGamer;
         }
+
 
         private void UpdateGamerEntity(Gamer existing, Gamer updated)
         {
@@ -100,10 +112,13 @@ namespace NDCRegistration
             existing.QrCode = updated.QrCode;
         }
 
+
         public void DeleteGame(Guid id)
         {
             UpdateGameState(id, GameState.Deleted);
         }
+
+
         private void UpdateGameState(Guid gameId, GameState state, int? score = null)
         {
             using (var scope = _scopeFactory.CreateScope())
@@ -125,37 +140,40 @@ namespace NDCRegistration
                 }
                 catch (Exception ex)
                 {
-                    throw;
+                    _logger.LogWarning(ex.Message);
                 }
             }
-
         }
+
 
         public Gamer GetGamer(Guid id)
         {
+            Gamer gamer = null;
+
             using (var scope = _scopeFactory.CreateScope())
             {
                 try
                 {
 
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
-                    var gamer =
+                    gamer =
                         dbContext.Gamers
                         .Include(f => f.Games)
                         .First(f => f.Id == id);
-
-                    return gamer;
                 }
                 catch (Exception ex)
                 {
-                    var msg = ex.ToString();
-                    throw;
+                    _logger.LogWarning(ex.Message);
                 }
             }
+
+            return gamer;
         }
+
 
         public List<Gamer> GetGamers()
         {
+            List<Gamer> gamers = null;
             using (var scope = _scopeFactory.CreateScope())
             {
                 try
@@ -163,21 +181,21 @@ namespace NDCRegistration
 
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
                     var gamersTest = dbContext.Gamers.ToList();
-                    var gamers =
+                    gamers =
                         dbContext.Gamers
                         .Include(f => f.Games)
                         .Where(f => f.Games.Any())
                         .ToList();
 
-                    return gamers;
                 }
                 catch (Exception ex)
                 {
-                    var msg = ex.ToString();
-                    throw;
+                    _logger.LogWarning(ex.Message);
                 }
             }
+            return gamers;
         }
+
 
         public void UpdateGameScore(Guid gameId, int score)
         {
@@ -186,27 +204,26 @@ namespace NDCRegistration
 
         public Game GetGamerLastPendingGame(Guid gamerId)
         {
+            Game game = null;
+
             using (var scope = _scopeFactory.CreateScope())
             {
                 try
                 {
-
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
-                    var game =
+                   game =
                         dbContext.Games
                         .Where(f => f.GamerId == gamerId)
                         .Where(f => f.State == GameState.Pending)
                         .OrderByDescending(f => f.DateCreated)
                         .FirstOrDefault();
-
-                    return game;
                 }
                 catch (Exception ex)
                 {
-                    var msg = ex.ToString();
-                    throw;
+                    _logger.LogWarning(ex.Message);
                 }
             }
+            return game;
         }
     }
 }
