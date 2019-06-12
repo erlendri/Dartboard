@@ -24,9 +24,10 @@ namespace NDCRegistration.Controllers
         [HttpPost]
         public IActionResult Register(Gamer model)
         {
+            var gamer = _dbcontextMethods.CreateOrUpdateGamer(model);
+            var game = _dbcontextMethods.CreateGame(gamer.Id);
             _handler.SyncClientGames();
             //post mqtt
-            Response.Redirect("index");
             return View("index", model);
         }
 

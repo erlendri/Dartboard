@@ -107,11 +107,7 @@ namespace NDCRegistration.Hubs
                 var currentGame = _mqttHandler.GameToSignalR(_mqttHandler.CurrentGame, out Gamer gamer);
                 if (currentGame == null)
                     return;
-                var gamerMini = gamer.ToMinimal();
-                _testTriesCounter++;
-                gamerMini.Tries = _testTriesCounter;
-                gamerMini.Score = new Random().Next(100) + currentGame.Score;
-                _mqttHandler.PostCustom(Topics.ScoreUpdate, gamerMini);
+                _mqttHandler.PostString(Topics.DartboardTest, "20;1");
             });
 
         }

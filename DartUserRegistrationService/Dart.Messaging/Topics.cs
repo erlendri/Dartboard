@@ -19,7 +19,7 @@ namespace Dart.Messaging
 
         //public const string GameCompleted = "hackathon/player/completed";
         //public const string GameAborted = "hackathon/player/aborted";
-
+        public const string DartboardTest = "hackathon/dartboard";
         public static Guid TestId = new Guid("7EC89CCF-E51C-49FB-8FFD-8DDC746A40BE");
 
     }

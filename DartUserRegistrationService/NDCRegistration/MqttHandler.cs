@@ -20,6 +20,7 @@ namespace NDCRegistration
         SignalRGame GetCurrentGameAsSignalR { get; }
         void SyncClientGames();
         void PostCustom(string topic, object obj);
+        void PostString(string topic, string text);
         SignalRGame GameToSignalR(Game currentGame, out Gamer gamer);
     }
     public class MqttHandler : IMqttHandler
@@ -161,6 +162,11 @@ namespace NDCRegistration
         public void PostCustom(string topic, object obj)
         {
             _messageHandler.Publish(topic, obj);
+        }
+
+        public void PostString(string topic, string text)
+        {
+            _messageHandler.PublishPlaintext(topic, text);
         }
     }
 

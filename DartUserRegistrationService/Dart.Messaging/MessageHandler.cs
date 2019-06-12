@@ -39,7 +39,6 @@ namespace Dart.Messaging
             }
         }
 
-        public int MyProperty { get; set; }
 
         public void Publish<T>(string topic, T payload)
         {
@@ -57,6 +56,11 @@ namespace Dart.Messaging
         public void Disconnect()
         {
             myClient.Disconnect();
+        }
+
+        public void PublishPlaintext(string topic, string text)
+        {
+            myClient.Publish(topic, Encoding.UTF8.GetBytes(text), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
         }
     }
 }
