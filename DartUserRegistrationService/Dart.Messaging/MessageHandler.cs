@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,13 +18,19 @@ namespace Dart.Messaging
     public class MqttMessageHandler : IMessageHandler
     {
         private MqttClient myClient;
-        private readonly string _clientId;
+        private string _clientId;
+       
+
         public MqttMessageHandler(string uri)
         {
             myClient = new MqttClient(uri);
 
             _clientId = Guid.NewGuid().ToString();
             myClient.Connect(_clientId);
+           _settings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
         }
 
 
@@ -44,7 +51,7 @@ namespace Dart.Messaging
         {
             if (!myClient.IsConnected)
                 myClient.Connect(_clientId);
-            var serializedPayload = JsonConvert.SerializeObject(payload);
+            var serializedPayload = JsonConvert.SerializeObject(payload, _settings);
             myClient.Publish(topic, Encoding.UTF8.GetBytes(serializedPayload), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
         }
 
