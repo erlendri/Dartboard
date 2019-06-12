@@ -42,7 +42,7 @@ namespace Dart.Messaging.Models
         public string Name { get; set; }
         [JsonProperty(PropertyName = "maxTries")]
         public int MaxTries { get; set; }
-        [JsonProperty(PropertyName = "tries")]
+        [JsonProperty(PropertyName = "count")]
         public int Tries { get; set; }
         [JsonProperty(PropertyName = "score")]
         public int Score { get; set; }
