@@ -33,19 +33,16 @@ namespace NDCRegistration
             _gamerStorage = gamerStorage;
             var key = _config.GetValue<string>("MqttSettings:BrokerUri");
             _messageHandler = new MqttMessageHandler(key);
-            //_messageHandler.Subscribe(Topics.GameCompleted);
-            //_messageHandler.Subscribe(Topics.GameAborted);
             _messageHandler.Subscribe(Topics.ScoreUpdate);
-            _messageHandler.Subscribe(Topics.GameStarted);
             _messageHandler.MqttMsgPublishReceived += _messageHandler_MqttMsgPublishReceived;
         }
         public void SyncClientGames()
         {
-            var gamers = _gamerStorage.GetGamers();
+            var gamers = _gamerStorage.GetRelevantGamers(CurrentGame?.Id);
             if (CurrentGame != null)
             {
                 var currentGame = gamers.SelectMany(f => f.Games).FirstOrDefault(g => g.Id == CurrentGame.Id);
-                if (currentGame != null && currentGame.State != GameState.Pending)
+                if (currentGame == null)
                     CurrentGame = null;
             }
             MessageHubMethods.SendCurrentGame(_hubContext, GetCurrentGameAsSignalR).Wait();
@@ -57,53 +54,26 @@ namespace NDCRegistration
             var message = Encoding.Default.GetString(e.Message);
             if (e.Topic == Topics.ScoreUpdate)
             {
-                GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
+                GetGamerFromMessage(message, out GamerMinimal gamerMinimal, out Gamer stored, out Game game);
                 if (game == null)
                     return;
-                _gamerStorage.UpdateGameScore(game.Id, gamer.Score);
-                game.Score = gamer.Score;
-                if (gamer.MaxTries <= gamer.Tries)
-                    CompleteGame(gamer, game);
-                else
+                _gamerStorage.UpdateGameScore(game.Id, gamerMinimal.Score);
+                game.Score = gamerMinimal.Score;
+                game.Tries = gamerMinimal.Tries;
+                game.MaxTries = gamerMinimal.MaxTries;
+                if (gamerMinimal.MaxTries <= gamerMinimal.Tries)
                 {
-
-                    SetCurrentGame(game);
-                    MessageHubMethods.SendGameUpdated(_hubContext, stored, gamer.Score).Wait();
+                    _gamerStorage.CompleteGame(game);
+                    game.State = GameState.Completed;
                 }
+                SetCurrentGame(game);
+                SyncClientGames();
             }
-            //else if (e.Topic == Topics.GameCompleted)
-            //{
-            //    GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
-            //    CompleteGame(gamer, game);
-
-            //}
-            //else if (e.Topic == Topics.GameAborted)
-            //{
-            //    GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
-            //    if (game != null)
-            //    {
-            //        _gamerStorage.DeleteGame(game.Id);
-            //    }
-            //    CurrentGame = null;
-            //    SyncClientGames();
-            //}
-
-        }
-
-        private void CompleteGame(GamerMinimal gamer, Game game)
-        {
-            if (game != null)
-            {
-                game.Score = gamer.Score;
-                _gamerStorage.CompleteGame(game);
-            }
-            CurrentGame = null;
-            SyncClientGames();
         }
 
         private void SetCurrentGame(Game game)
         {
-            if (CurrentGame != null && CurrentGame.Id != game.Id)
+            if (CurrentGame != null && CurrentGame.Id != game.Id && CurrentGame.State == GameState.Pending)
             {
                 _gamerStorage.DeleteGame(CurrentGame.Id);
             }
@@ -117,17 +87,15 @@ namespace NDCRegistration
         {
             gamer = JsonConvert.DeserializeObject<GamerMinimal>(message);
             stored = _gamerStorage.GetGamer(gamer.Id);
-            game = stored.Games.OrderByDescending(g=>g.DateCreated).First(g=>g.State == GameState.Pending);
+            game = stored.Games.OrderByDescending(g => g.DateCreated).First(g => g.State == GameState.Pending);
         }
 
         public void PostGameStarted(GamerMinimal gamer)
         {
             var game = _gamerStorage.GetGamerLastPendingGame(gamer.Id);
-            if (game.Score > 0)
-            {
-                _gamerStorage.CompleteGame(game);
-                game = _gamerStorage.CreateGame(game.GamerId);
-            }
+            if (game == null)
+                game = _gamerStorage.CreateGame(gamer.Id);
+            game.Score = 0;
             SetCurrentGame(game);
             SyncClientGames();
             _messageHandler.Publish(Topics.GameStarted, gamer);
@@ -149,7 +117,7 @@ namespace NDCRegistration
             if (currentGame == null)
                 return null;
             var gamer = _gamerStorage.GetGamer(currentGame.GamerId);
-            return new SignalRGame(gamer.Id, gamer.DisplayName, currentGame.Score);
+            return new SignalRGame(gamer.Id, gamer.DisplayName, currentGame.Score, currentGame.Tries, currentGame.MaxTries);
         }
         public SignalRGame GameToSignalR(Game currentGame, out Gamer gamer)
         {
@@ -157,7 +125,7 @@ namespace NDCRegistration
             if (currentGame == null)
                 return null;
             gamer = _gamerStorage.GetGamer(currentGame.GamerId);
-            return new SignalRGame(gamer.Id, gamer.DisplayName, currentGame.Score);
+            return new SignalRGame(gamer.Id, gamer.DisplayName, currentGame.Score, currentGame.Tries, currentGame.MaxTries);
         }
         public void PostCustom(string topic, object obj)
         {

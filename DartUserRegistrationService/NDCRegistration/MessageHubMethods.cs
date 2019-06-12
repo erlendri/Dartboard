@@ -11,18 +11,13 @@ namespace NDCRegistration
 {
     public static class MessageHubMethods
     {
-        internal async static Task SendGameUpdated(IHubContext<MessageHub> hubContext, Gamer gamer, int score)
-        {
-            var signalRGame = new SignalRGame(gamer.Id, gamer.DisplayName, score);
-            await hubContext.Clients.All.SendAsync(SignalRTopics.ScoreUpdate, signalRGame);
-        }
         internal async static Task SendAllPendingGames(IHubContext<MessageHub> hubContext, List<Gamer> gamers, SignalRGame currentGame)
         {
             var games = gamers
                 .Where(f => f.Games.Any(st => st.State == GameState.Pending))
                 .Where(f => currentGame == null || currentGame.Id != f.Id)
                 .OrderBy(f=>f.Games.Where(g=>g.State == GameState.Pending).Max(g=>g.DateCreated))
-                .Select(f => new SignalRGame(f.Id, f.DisplayName)).ToList();
+                .Select(f => new SignalRGame(f.Id, f.DisplayName, 0, 0, 3)).ToList();
 
             await hubContext.Clients.All.SendAsync(SignalRTopics.GamesPending, games);
         }
@@ -37,7 +32,7 @@ namespace NDCRegistration
             var games = gamers
                 .Where(f => f.Games.Any(st => st.State == GameState.Completed))
                 .GroupBy(f=>f.Id)
-                .Select(f=>new SignalRGame(f.Key, f.Max(g=>g.DisplayName), f.SelectMany(g=>g.Games).Where(h=>h.State == GameState.Completed).Max(h=>h.Score)))
+                .Select(f=>new SignalRGame(f.Key, f.Max(g=>g.DisplayName), f.SelectMany(g=>g.Games).Where(h=>h.State == GameState.Completed).Max(h=>h.Score), 3, 3))
                 .OrderByDescending(f => f.Score).Take(30)
                 .ToList();
 

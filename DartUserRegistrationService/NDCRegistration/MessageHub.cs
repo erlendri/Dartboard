@@ -34,7 +34,6 @@ namespace NDCRegistration.Hubs
             var gamer = _gamerStorage.GetGamer(id).ToMinimal();
             await Task.Run(() =>
             {
-                _testTriesCounter = 0;
                 _mqttHandler.PostGameStarted(gamer);
             });
         }
@@ -99,7 +98,6 @@ namespace NDCRegistration.Hubs
             //    }
             //}
         }
-        private static int _testTriesCounter = 0;
         public async Task TestUpdateCurrent()
         {
             await Task.Run(() =>

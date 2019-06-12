@@ -90,6 +90,7 @@ body {
     -ms-user-select: none;
     user-select: none;
 }
+
 .carousel-caption {
     padding-top: 0px;
     padding-bottom: 50px;
@@ -117,6 +118,7 @@ body {
 
     .player .player-name {
         grid-area: name;
+        padding-right: 5px;
     }
 
     .player .player-score {
@@ -125,27 +127,32 @@ body {
         font-size: 40px;
     }
 
+    .player .player-tries {
+        display: none;
+    }
+
+
 .highscore-container-wrapper {
     height: 100%;
     display: grid;
-    grid-template: "left right" auto/50% 50%;
-    grid-gap: 25px;
+    grid-template: "left middle right" auto/33% 33% 33%;
+    grid-gap: 15px;
     align-content: center;
 }
 
 .highscore-container {
     display: grid;
     grid-auto-flow: row;
-    align-content:  flex-start;
+    align-content: flex-start;
     justify-content: flex-start;
 }
 
 .player-highscore {
     display: grid;
-    grid-template: "rank name score" auto/15px auto 50px;
+    grid-template: "rank name score" auto/20px auto 20px;
     white-space: nowrap;
     width: 100%;
-    padding: 15px 7px 15px 5px;
+    padding: 2px 5px 2px 2px;
 }
 
     .player-highscore .player-name {
@@ -169,12 +176,14 @@ body {
     .carousel-indicators {
         display: none;
     }
+
     .highscore-container-wrapper {
         grid-gap: 5px;
     }
 
     .player-highscore {
-        padding: 2px 1px 2px 1px;
+        padding: 1px 1px 1px 1px;
+        font-size: 7px;
     }
 }
 
@@ -191,7 +200,7 @@ body {
     }
 
     #player-current > .player {
-        grid-template: "blank name score" 100px/25px auto 120px;
+        grid-template: "blank name tries score" 100px/25px auto auto 120px;
     }
 
         #player-current > .player .player-button-delete,
@@ -210,6 +219,12 @@ body {
     #player-current .player-score {
         grid-area: score;
     }
+
+    #player-current .player-tries {
+        display: block;
+        grid-area: tries;
+    }
+
 
 .player-button span {
     margin: 14px;

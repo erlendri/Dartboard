@@ -8,6 +8,7 @@ namespace NDCRegistration
     {
         Gamer GetGamer(Guid id);
         Gamer CreateOrUpdateGamer(Gamer gamer);
+        List<Gamer> GetRelevantGamers(Guid? currentGameId);
 
         List<Gamer> GetGamers();
         Game CreateGame(Guid gamerId);

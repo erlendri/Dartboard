@@ -4,13 +4,14 @@
   playerClass: 'player',
   playerName: 'player-name',
   playerScore: 'player-score',
+  playerTries: 'player-tries',
   playerRank: 'player-rank',
   nextAreaId: 'player-next',
   currentAreaId: 'player-current',
   templatePlayerId: 'player-template',
   templatePlayerHighscoreId: 'player-highscore-template',
   highscoreContainer: 'highscore-container',
-  highscoreItemsPerPage: 5,
+  highscoreItemsPerPage: 10,
   Init: () => {
     let nextArea = document.getElementById(app.nextAreaId);
     nextArea.addEventListener('click', v => {
@@ -68,6 +69,15 @@
   UpdatePlayerNode: (node, game) => {
     node.id = game.id;
     node.getElementsByClassName(app.playerScore)[0].innerHTML = game.score;
+    let gameTries = "Waiting for game to start";
+    if (game.maxTries > 0) {
+      if (game.tries >= game.maxTries)
+        gameTries = "Game completed";
+      else {
+        gameTries = `Throws remaining: ${game.maxTries - game.tries}`;
+      }
+    }
+    node.getElementsByClassName(app.playerTries)[0].innerHTML = gameTries;
     if (game.name !== undefined && game.name !== null)
       node.getElementsByClassName(app.playerName)[0].innerHTML = game.name;
   },
@@ -85,7 +95,7 @@
       var node = highScoreArea.lastElementChild;
       var game = games[i];
       node.setAttribute('data-id', game.id);
-      node.getElementsByClassName(app.playerRank)[0].innerHTML = `${i+1}.`;
+      node.getElementsByClassName(app.playerRank)[0].innerHTML = `${i + 1}.`;
       node.getElementsByClassName(app.playerScore)[0].innerHTML = game.score;
       if (game.name !== undefined && game.name !== null)
         node.getElementsByClassName(app.playerName)[0].innerHTML = game.name;

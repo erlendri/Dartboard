@@ -21,6 +21,10 @@ namespace Dart.Messaging.Models
         public int Score { get; set; }
         public GameState State { get; set; }
         public DateTime DateCreated { get; set; }
+        [NotMapped]
+        public int Tries { get; set; }
+        [NotMapped]
+        public int MaxTries { get; set; }
 
     }
 }

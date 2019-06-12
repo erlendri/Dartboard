@@ -17,10 +17,12 @@
           </div>
           <div class="highscore-container" data-id="2">
           </div>
+          <div class="highscore-container" data-id="3">
+          </div>
         </div>
       </div>
     </div>
-    <div class="item">
+    @*<div class="item">
       <img src="~/images/banner2.svg" class="img-responsive" />
       <div class="carousel-caption" role="option">
         <div class="highscore-container-wrapper">
@@ -41,7 +43,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>*@
 
   </div>
   <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
@@ -68,6 +70,7 @@
 <template id="player-template">
   <div id="@(Guid.Empty)" class="player">
     <div class="player-name">Player name</div>
+    <div class="player-tries">1</div>
     <div class="player-score">1234</div>
     <div class="player-button-delete player-button"><span></span></div>
     <div class="player-button-start player-button"><span></span></div>

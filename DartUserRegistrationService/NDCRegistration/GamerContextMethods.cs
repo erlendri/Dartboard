@@ -51,6 +51,7 @@ namespace NDCRegistration
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex.Message);
+                    throw;
                 }
             }
             return game;
@@ -94,6 +95,7 @@ namespace NDCRegistration
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex.Message);
+                    throw;
                 }
             }
             _logger.LogInformation($"Gamer created or modified: {modifiedGamer.DisplayName}");
@@ -136,6 +138,7 @@ namespace NDCRegistration
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex.Message);
+                    throw;
                 }
             }
         }
@@ -159,6 +162,7 @@ namespace NDCRegistration
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex.Message);
+                    throw;
                 }
             }
 
@@ -186,6 +190,7 @@ namespace NDCRegistration
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex.Message);
+                    throw;
                 }
             }
             return gamers;
@@ -216,9 +221,34 @@ namespace NDCRegistration
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex.Message);
+                    throw;
                 }
             }
             return game;
+        }
+
+        public List<Gamer> GetRelevantGamers(Guid? currentGameId)
+        {
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                try
+                {
+                    var currentGuid = currentGameId ?? Guid.Empty;
+                    var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
+                    var gamesCompleted = dbContext.Games.Where(f => f.State == GameState.Completed).GroupBy(f => f.GamerId).Select(g => g.OrderByDescending(h => h.Score).First()).Take(100);
+                    var gamesPendingOrCurrent = dbContext.Games.Where(f => f.State == GameState.Pending || f.Id == currentGuid);
+                    var gamersAll = (from game in gamesCompleted.Union(gamesPendingOrCurrent)
+                                     join gamer in dbContext.Gamers.Include(f => f.Games) on game.GamerId equals gamer.Id
+                                     select gamer).Distinct().ToList();
+                    return gamersAll;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex.Message);
+                    throw;
+                }
+            }
+
         }
     }
 }
