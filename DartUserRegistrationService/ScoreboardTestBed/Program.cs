@@ -18,7 +18,7 @@ namespace ScoreboardTestBed
         {
             //MqttTests();
 
-            DatabaseTests();
+            //DatabaseTests();
 
         }
 
@@ -34,9 +34,6 @@ namespace ScoreboardTestBed
             var packmanPlayer = new Gamer()
             {
                 Id = gamerId,
-                Email = "email@gamer.com",
-                FirstName = "John",
-                LastName = "Doe"
             };
 
             client.Publish<Gamer>(Topics.Gamer, packmanPlayer);
@@ -47,36 +44,33 @@ namespace ScoreboardTestBed
             client.Publish<Score>(Topics.Score, score);
         }
 
-        private static void DatabaseTests()
-        {
-            DbContextOptionsBuilder<GamerContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<GamerContext>();
-            dbContextOptionsBuilder.UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=NDCRegistration_db;Trusted_Connection=True;");//"Data Source = ndcregistrationdbserver.database.windows.net; Initial Catalog = NDCRegistration_db; User ID = TeleplanNDC; Password = ThreeLittlePigs3; Connect Timeout = 60; Encrypt = True; TrustServerCertificate = False; ApplicationIntent = ReadWrite; MultiSubnetFailover = False");
-            var gamerContext = new GamerContext(dbContextOptionsBuilder.Options);
-           // gamerContext.Database.Migrate();
-            LiveGamerStorage gamerStorage = new LiveGamerStorage(gamerContext);
+        //private static void DatabaseTests()
+        //{
+        //    DbContextOptionsBuilder<GamerContext> dbContextOptionsBuilder = new DbContextOptionsBuilder<GamerContext>();
+        //    dbContextOptionsBuilder.UseSqlServer("Data Source=.\\SQLEXPRESS;Initial Catalog=NDCRegistration_db;Trusted_Connection=True;");//"Data Source = ndcregistrationdbserver.database.windows.net; Initial Catalog = NDCRegistration_db; User ID = TeleplanNDC; Password = ThreeLittlePigs3; Connect Timeout = 60; Encrypt = True; TrustServerCertificate = False; ApplicationIntent = ReadWrite; MultiSubnetFailover = False");
+        //    var gamerContext = new GamerContext(dbContextOptionsBuilder.Options);
+        //   // gamerContext.Database.Migrate();
+        //    GamerContextMethods gamerStorage = new GamerContextMethods();
 
-            var packmanPlayer2 = new Gamer()
-            {
-                Email = "Michael@gamer.com",
-                DisplayName = "Moonwalker",
-                FirstName = "Michael",
-                LastName = "Jackson"
-            };
-            var createdGamer = gamerStorage.CreateOrUpdateGamer(packmanPlayer2);
-            var game = new Game()
-            {
-                GamerId = createdGamer.Id,
-                Score = 1337,
-                State = GameState.Pending
-            };
+        //    var packmanPlayer2 = new Gamer()
+        //    {
+        //        DisplayName = "Moonwalker",
+        //    };
+        //    var createdGamer = gamerStorage.CreateOrUpdateGamer(packmanPlayer2);
+        //    var game = new Game()
+        //    {
+        //        GamerId = createdGamer.Id,
+        //        Score = 1337,
+        //        State = GameState.Pending
+        //    };
 
-            var createdGame = gamerStorage.CreateGame(game);
+        //    var createdGame = gamerStorage.CreateGame(game);
 
 
-            gamerStorage.CompleteGame(createdGame);
-            //Console.Read();
-            gamerStorage.DeleteGame(createdGame.Id);
-        }
+        //    gamerStorage.CompleteGame(createdGame);
+        //    //Console.Read();
+        //    gamerStorage.DeleteGame(createdGame.Id);
+        //}
 
 
         public static void PublishReceived(object sender, MqttMsgPublishEventArgs e)
@@ -88,7 +82,7 @@ namespace ScoreboardTestBed
 
                 var wiredGamer = JsonConvert.DeserializeObject<Gamer>(message);
 
-                Console.WriteLine($"Email from transferred gamer: {wiredGamer.Email}");
+                Console.WriteLine($"Email from transferred gamer: {wiredGamer.DisplayName}");
             }
             else
             {

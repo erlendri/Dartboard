@@ -32,10 +32,10 @@ namespace NDCRegistration
             _gamerStorage = gamerStorage;
             var key = _config.GetValue<string>("MqttSettings:BrokerUri");
             _messageHandler = new MqttMessageHandler(key);
-            _messageHandler.Subscribe(Topics.GameCompleted);
-            _messageHandler.Subscribe(Topics.GameAborted);
+            //_messageHandler.Subscribe(Topics.GameCompleted);
+            //_messageHandler.Subscribe(Topics.GameAborted);
             _messageHandler.Subscribe(Topics.ScoreUpdate);
-            //_messageHandler.Subscribe(Topics.GameStarted);
+            _messageHandler.Subscribe(Topics.GameStarted);
             _messageHandler.MqttMsgPublishReceived += _messageHandler_MqttMsgPublishReceived;
         }
         public void SyncClientGames()
@@ -61,7 +61,7 @@ namespace NDCRegistration
                     return;
                 _gamerStorage.UpdateGameScore(game.Id, gamer.Score);
                 game.Score = gamer.Score;
-                if (gamer.MaxTries <= 0)
+                if (gamer.MaxTries <= gamer.Tries)
                     CompleteGame(gamer, game);
                 else
                 {
@@ -70,22 +70,22 @@ namespace NDCRegistration
                     MessageHubMethods.SendGameUpdated(_hubContext, stored, gamer.Score).Wait();
                 }
             }
-            else if (e.Topic == Topics.GameCompleted)
-            {
-                GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
-                CompleteGame(gamer, game);
+            //else if (e.Topic == Topics.GameCompleted)
+            //{
+            //    GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
+            //    CompleteGame(gamer, game);
 
-            }
-            else if (e.Topic == Topics.GameAborted)
-            {
-                GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
-                if (game != null)
-                {
-                    _gamerStorage.DeleteGame(game.Id);
-                }
-                CurrentGame = null;
-                SyncClientGames();
-            }
+            //}
+            //else if (e.Topic == Topics.GameAborted)
+            //{
+            //    GetGamerFromMessage(message, out GamerMinimal gamer, out Gamer stored, out Game game);
+            //    if (game != null)
+            //    {
+            //        _gamerStorage.DeleteGame(game.Id);
+            //    }
+            //    CurrentGame = null;
+            //    SyncClientGames();
+            //}
 
         }
 

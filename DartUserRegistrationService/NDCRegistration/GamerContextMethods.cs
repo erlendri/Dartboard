@@ -30,7 +30,7 @@ namespace NDCRegistration
         public Game CreateGame(Guid gamerId)
         {
             Game game = null;
-            
+
             using (var scope = _scopeFactory.CreateScope())
             {
                 try
@@ -40,7 +40,7 @@ namespace NDCRegistration
                         .First(f => f.Id == gamerId);
                     game = new Game
                     {
-                        Score = 0,                        
+                        Score = 0,
                         State = GameState.Pending,
                         DateCreated = DateTime.Now
                     };
@@ -68,9 +68,7 @@ namespace NDCRegistration
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
                     var existing = dbContext.Gamers
                         .Include(f => f.Games)
-                        .FirstOrDefault(f =>
-            (!string.IsNullOrWhiteSpace(gamer.QrCode) && f.QrCode == gamer.QrCode) ||
-            (!string.IsNullOrWhiteSpace(gamer.Email) && f.Email == gamer.Email));
+                        .FirstOrDefault(f => !string.IsNullOrWhiteSpace(gamer.QrCode) && f.QrCode == gamer.QrCode);
 
                     if (existing != null)
                     {
@@ -78,7 +76,7 @@ namespace NDCRegistration
                             .Where(f => f.State == GameState.Pending)
                             .ToList();
 
-                        existingGames.Where(f=>f.Score > 0).ToList()
+                        existingGames.Where(f => f.Score > 0).ToList()
                         .ForEach(f => f.State = GameState.Completed);
                         existingGames.Where(f => f.Score <= 0).ToList()
                         .ForEach(f => f.State = GameState.Deleted);
@@ -89,9 +87,9 @@ namespace NDCRegistration
                     }
                     else
                     {
-                       modifiedGamer =  dbContext.Gamers.Add(gamer).Entity;
+                        modifiedGamer = dbContext.Gamers.Add(gamer).Entity;
                     }
-                    dbContext.SaveChanges();  
+                    dbContext.SaveChanges();
                 }
                 catch (Exception ex)
                 {
@@ -106,9 +104,6 @@ namespace NDCRegistration
         private void UpdateGamerEntity(Gamer existing, Gamer updated)
         {
             existing.DisplayName = updated.DisplayName;
-            existing.Email = updated.Email;
-            existing.FirstName = updated.FirstName;
-            existing.LastName = updated.LastName;
             existing.QrCode = updated.QrCode;
         }
 
@@ -211,12 +206,12 @@ namespace NDCRegistration
                 try
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
-                   game =
-                        dbContext.Games
-                        .Where(f => f.GamerId == gamerId)
-                        .Where(f => f.State == GameState.Pending)
-                        .OrderByDescending(f => f.DateCreated)
-                        .FirstOrDefault();
+                    game =
+                         dbContext.Games
+                         .Where(f => f.GamerId == gamerId)
+                         .Where(f => f.State == GameState.Pending)
+                         .OrderByDescending(f => f.DateCreated)
+                         .FirstOrDefault();
                 }
                 catch (Exception ex)
                 {

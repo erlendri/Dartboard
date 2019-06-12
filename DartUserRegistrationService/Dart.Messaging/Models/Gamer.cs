@@ -15,15 +15,8 @@ namespace Dart.Messaging.Models
         [DisplayName("Display name")]
         [Required]
         public string DisplayName { get; set; }
-        [DisplayName("First name")]
-        public string FirstName { get; set; }
-        [DisplayName("Last name")]
-        public string LastName { get; set; }
-        [DisplayName("Email")]
-        [EmailAddress]
-        public string Email { get; set; }
-
         [DisplayName("QrCode")]
+        [Required]
         public string QrCode { get; set; }
 
         public List<Game> Games { get; set; } = new List<Game>();
@@ -34,16 +27,24 @@ namespace Dart.Messaging.Models
             {
                 Id = Id,
                 Name = DisplayName,
-                MaxTries = 3
+                MaxTries = 3,
+                Tries = 0
             };
         }
        
     }
+
     public class GamerMinimal
     {
+        [JsonProperty(PropertyName = "id")]
         public Guid Id { get; set; }
+        [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
+        [JsonProperty(PropertyName = "maxTries")]
         public int MaxTries { get; set; }
+        [JsonProperty(PropertyName = "tries")]
+        public int Tries { get; set; }
+        [JsonProperty(PropertyName = "score")]
         public int Score { get; set; }
     }
 }

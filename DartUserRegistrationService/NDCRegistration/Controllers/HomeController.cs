@@ -17,39 +17,6 @@ namespace NDCRegistration.Controllers
         {
              return View();
         }
-        [HttpPost]
-        public IActionResult Register(Gamer model)
-        {
-            var hasQr = !string.IsNullOrWhiteSpace(model.QrCode);
-            var hasDetails =
-                !string.IsNullOrWhiteSpace(model.FirstName) &&
-                !string.IsNullOrWhiteSpace(model.LastName) &&
-                !string.IsNullOrWhiteSpace(model.Email);
-            var hasDetailsAny =
-                !string.IsNullOrWhiteSpace(model.FirstName) ||
-                !string.IsNullOrWhiteSpace(model.LastName) ||
-                !string.IsNullOrWhiteSpace(model.Email);
-            if (hasQr || hasDetails)
-            {
-                //post mqtt
-                Response.Redirect("index");
-            }
-            else if (hasDetailsAny)
-            {
-                if (string.IsNullOrWhiteSpace(model.FirstName))
-                    ModelState.AddModelError(nameof(model.FirstName), "Enter first name");
-                if (string.IsNullOrWhiteSpace(model.LastName))
-                    ModelState.AddModelError(nameof(model.LastName), "Enter last name");
-                if (string.IsNullOrWhiteSpace(model.Email))
-                    ModelState.AddModelError(nameof(model.Email), "Enter email");
-            }
-            else
-            {
-                ModelState.AddModelError("", "Either scan a QR code, or enter the name + details below");
-            }
-            return View("index", model);
-        }
-
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";

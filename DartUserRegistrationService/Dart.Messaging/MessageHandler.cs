@@ -17,7 +17,7 @@ namespace Dart.Messaging
     public class MqttMessageHandler : IMessageHandler
     {
         private MqttClient myClient;
-        private string _clientId;
+        private readonly string _clientId;
         public MqttMessageHandler(string uri)
         {
             myClient = new MqttClient(uri);
