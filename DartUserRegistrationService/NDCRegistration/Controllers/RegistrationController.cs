@@ -1,11 +1,13 @@
 ﻿using System.Diagnostics;
 using Dart.Messaging.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NDCRegistration.Models;
 
 namespace NDCRegistration.Controllers
 {
+    [Authorize]
     public class RegistrationController : Controller
     {
         private readonly IMqttHandler _handler;

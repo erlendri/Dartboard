@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dart.Messaging.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -40,17 +41,26 @@ namespace NDCRegistration
             {
                 opts.UseSqlServer(Configuration["ConnectionString:GamerDB"]);
             });
-            
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .AddCookie(options =>
+                    {
+                        options.LoginPath = "/Login/UserLogin/";
+
+                    });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddSignalR();
-            services.AddSingleton<IMqttHandler, MqttHandler>();
-            services.AddSingleton<IGamerContextMethods, GamerContextMethods>();
+                services.AddSignalR();
+                services.AddSingleton<IMqttHandler, MqttHandler>();
+                services.AddSingleton<IGamerContextMethods, GamerContextMethods>();
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseAuthentication();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -72,7 +82,7 @@ namespace NDCRegistration
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Login}/{action=UserLogin}/{id?}"); //"{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
