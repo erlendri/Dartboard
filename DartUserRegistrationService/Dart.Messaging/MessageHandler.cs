@@ -19,7 +19,7 @@ namespace Dart.Messaging
     {
         private MqttClient myClient;
         private string _clientId;
-       
+        private JsonSerializerSettings _settings;
 
         public MqttMessageHandler(string uri)
         {
