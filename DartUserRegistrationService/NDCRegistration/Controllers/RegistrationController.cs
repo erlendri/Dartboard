@@ -28,7 +28,7 @@ namespace NDCRegistration.Controllers
             var game = _dbcontextMethods.CreateGame(gamer.Id);
             _handler.SyncClientGames();
             //post mqtt
-            return View("index", model);
+            return View("index", new Gamer());
         }
 
         public IActionResult About()
