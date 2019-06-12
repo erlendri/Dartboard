@@ -17,9 +17,9 @@ namespace Dart.Messaging
         //{"id":"007","name":"James Bond","maxTries":3,"score":16}
         public const string ScoreUpdate = "hackathon/player/score";
 
-        public const string GameCompleted = "hackathon/player/completed";
-        public const string GameAborted = "hackathon/player/aborted";
-
+        //public const string GameCompleted = "hackathon/player/completed";
+        //public const string GameAborted = "hackathon/player/aborted";
+        public const string DartboardTest = "hackathon/dartboard";
         public static Guid TestId = new Guid("7EC89CCF-E51C-49FB-8FFD-8DDC746A40BE");
 
     }

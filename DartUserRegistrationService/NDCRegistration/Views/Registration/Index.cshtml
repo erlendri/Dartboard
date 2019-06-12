@@ -29,25 +29,6 @@
     <div class="form-group">
       <input type="submit" value="Queue gamer" class="btn btn-primary" />
     </div>
-    <div class="form-group">OR <hr /></div>
-    <div class="form-group">
-      <label asp-for="FirstName" class="control-label"></label>
-      <input asp-for="FirstName" class="form-control" placeholder="Enter first name" />
-      <span asp-validation-for="FirstName" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-      <label asp-for="LastName" class="control-label"></label>
-      <input asp-for="LastName" class="form-control" placeholder="Enter last name" />
-      <span asp-validation-for="LastName" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-      <label asp-for="Email" class="control-label"></label>
-      <input asp-for="Email" class="form-control" placeholder="Enter email" />
-      <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-      <input type="submit" value="Queue gamer" class="btn btn-primary" />
-    </div>
   </form>
 </div>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/3.3.3/adapter.min.js"></script>
@@ -63,9 +44,6 @@
 
     connection.on("@(SignalRTopics.UserLookup)", function (gamer) {
       SetFieldFromLookup(gamer.displayName, @(nameof(Model.DisplayName)));
-      SetFieldFromLookup(gamer.firstName, @(nameof(Model.FirstName)));
-      SetFieldFromLookup(gamer.lastName, @(nameof(Model.LastName)));
-      SetFieldFromLookup(gamer.email, @(nameof(Model.Email)));
     });
 
     connection.start().then(function () {

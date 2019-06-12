@@ -1,9 +1,12 @@
 ﻿using Dart.Messaging;
 using Dart.Messaging.Models;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
 using NDCRegistration.MessageHubModels;
+using NDCRegistration.Models;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace NDCRegistration.Hubs
@@ -15,12 +18,15 @@ namespace NDCRegistration.Hubs
         private readonly IGamerContextMethods _gamerStorage;
         private readonly IHubContext<MessageHub> _hubContext;
 
-        public MessageHub(IMqttHandler mqttHandler, IGamerContextMethods gamerStorage, IHubContext<MessageHub> context)
+        public string ApiUri { get; }
+
+        public MessageHub(IMqttHandler mqttHandler, IGamerContextMethods gamerStorage, IHubContext<MessageHub> context, IConfiguration configuration)
         {
             Id = Guid.NewGuid();
             _mqttHandler = mqttHandler;
             _gamerStorage = gamerStorage;
             _hubContext = context;
+            ApiUri = configuration["ApiUri"];
 
         }
         public async Task StartGame(Guid id)
@@ -28,6 +34,7 @@ namespace NDCRegistration.Hubs
             var gamer = _gamerStorage.GetGamer(id).ToMinimal();
             await Task.Run(() =>
             {
+                _testTriesCounter = 0;
                 _mqttHandler.PostGameStarted(gamer);
             });
         }
@@ -63,7 +70,36 @@ namespace NDCRegistration.Hubs
             var gamer = gamers.FirstOrDefault(f => f.QrCode == qr);
             if (gamer != null)
                 await Clients.Caller.SendAsync(SignalRTopics.UserLookup, gamer);
+            //else
+            //{
+            //    if (float.TryParse(qr, out float scannedQr))
+            //    {
+            //        //get the qr from the api
+            //        var uri = ApiUri + qr;
+            //        var client = new HttpClient();
+            //        await Task.Run(() =>
+            //        {
+            //            var res = client.GetAsync(uri).Result;
+                        
+            //            if (res.IsSuccessStatusCode)
+            //            {
+
+            //                var strResult = res.Content.ReadAsStringAsync().Result;
+            //                var parsed = ApiResponse.FromJson(strResult);
+            //                gamer = new Gamer
+            //                {
+            //                    QrCode = qr,
+            //                    DisplayName = parsed.FirstName != null && parsed.FirstName.Length > 0 ?
+            //                    $"{parsed.FirstName.Substring(0, 1)}. {parsed.Surname}" : "Anonymous"
+            //                };
+            //                Clients.Caller.SendAsync(SignalRTopics.UserLookup, gamer);
+            //            }
+
+            //        });
+            //    }
+            //}
         }
+        private static int _testTriesCounter = 0;
         public async Task TestUpdateCurrent()
         {
             await Task.Run(() =>
@@ -71,9 +107,7 @@ namespace NDCRegistration.Hubs
                 var currentGame = _mqttHandler.GameToSignalR(_mqttHandler.CurrentGame, out Gamer gamer);
                 if (currentGame == null)
                     return;
-                var gamerMini = gamer.ToMinimal();
-                gamerMini.Score = new Random().Next(100) + currentGame.Score;
-                _mqttHandler.PostCustom(Topics.ScoreUpdate, gamerMini);
+                _mqttHandler.PostString(Topics.DartboardTest, "20;1");
             });
 
         }
@@ -86,7 +120,8 @@ namespace NDCRegistration.Hubs
                     return;
                 var gamerMini = gamer.ToMinimal();
                 gamerMini.Score = new Random().Next(100) + currentGame.Score;
-                gamerMini.MaxTries = 0;
+                gamerMini.MaxTries = 3;
+                gamerMini.Tries = 3;
                 _mqttHandler.PostCustom(Topics.ScoreUpdate, gamerMini);
             });
 
