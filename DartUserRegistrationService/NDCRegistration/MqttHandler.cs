@@ -87,7 +87,7 @@ namespace NDCRegistration
         {
             gamer = JsonConvert.DeserializeObject<GamerMinimal>(message);
             stored = _gamerStorage.GetGamer(gamer.Id);
-            game = stored.Games.OrderByDescending(g => g.DateCreated).First(g => g.State == GameState.Pending);
+            game = stored.Games.OrderByDescending(g => g.DateCreated).FirstOrDefault(g => g.State == GameState.Pending);
         }
 
         public void PostGameStarted(GamerMinimal gamer)

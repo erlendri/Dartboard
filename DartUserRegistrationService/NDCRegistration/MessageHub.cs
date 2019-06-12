@@ -69,36 +69,8 @@ namespace NDCRegistration.Hubs
             var gamer = gamers.FirstOrDefault(f => f.QrCode == qr);
             if (gamer != null)
                 await Clients.Caller.SendAsync(SignalRTopics.UserLookup, gamer);
-            //else
-            //{
-            //    if (float.TryParse(qr, out float scannedQr))
-            //    {
-            //        //get the qr from the api
-            //        var uri = ApiUri + qr;
-            //        var client = new HttpClient();
-            //        await Task.Run(() =>
-            //        {
-            //            var res = client.GetAsync(uri).Result;
-                        
-            //            if (res.IsSuccessStatusCode)
-            //            {
-
-            //                var strResult = res.Content.ReadAsStringAsync().Result;
-            //                var parsed = ApiResponse.FromJson(strResult);
-            //                gamer = new Gamer
-            //                {
-            //                    QrCode = qr,
-            //                    DisplayName = parsed.FirstName != null && parsed.FirstName.Length > 0 ?
-            //                    $"{parsed.FirstName.Substring(0, 1)}. {parsed.Surname}" : "Anonymous"
-            //                };
-            //                Clients.Caller.SendAsync(SignalRTopics.UserLookup, gamer);
-            //            }
-
-            //        });
-            //    }
-            //}
         }
-        public async Task TestUpdateCurrent()
+        public async Task TestThrowDart()
         {
             await Task.Run(() =>
             {
@@ -109,7 +81,7 @@ namespace NDCRegistration.Hubs
             });
 
         }
-        public async Task TestCompleteGame()
+        public async Task TestUpdateScore()
         {
             await Task.Run(() =>
             {
@@ -117,12 +89,27 @@ namespace NDCRegistration.Hubs
                 if (currentGame == null)
                     return;
                 var gamerMini = gamer.ToMinimal();
-                gamerMini.Score = new Random().Next(100) + currentGame.Score;
+                gamerMini.Score = new Random().Next(10) + currentGame.Score;
                 gamerMini.MaxTries = 3;
-                gamerMini.Tries = 3;
+                gamerMini.Tries = _mqttHandler.CurrentGame.Tries + 1;
                 _mqttHandler.PostCustom(Topics.ScoreUpdate, gamerMini);
             });
 
+        }
+        public async Task QueueRandomPlayer()
+        {
+            await Task.Run(() =>
+            {
+                var gamers = _gamerStorage.GetGamers();
+                var gamer = new Gamer
+                {
+                    DisplayName = $"Gamer {gamers.Count + 1}",
+                    QrCode = Guid.NewGuid().ToString()
+                };
+                _gamerStorage.CreateOrUpdateGamer(gamer);
+                var game = _gamerStorage.CreateGame(gamer.Id);
+                _mqttHandler.SyncClientGames();
+            });
         }
     }
 }

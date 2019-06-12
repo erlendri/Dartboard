@@ -100,8 +100,8 @@ body {
 
 
 .player {
-    border-radius: 15px;
     background: url("../images/playerbackground.svg");
+    border-radius: 15px;
     background-size: 100% 100%;
     display: grid;
     justify-items: flex-start;
@@ -131,17 +131,21 @@ body {
         display: none;
     }
 
-
 .highscore-container-wrapper {
-    height: 100%;
     display: grid;
-    grid-template: "left middle right" auto/33% 33% 33%;
+    grid-template: "left middle right" auto/auto auto auto;
     grid-gap: 15px;
     align-content: center;
+    background: url("../images/playerbackground.svg");
+    border-radius: 15px;
+    background-size: 100% 100%;
+    padding: 7px 15px 7px 20px;
+    color: white;
+    margin-bottom: 55px;
 }
 
 .highscore-container {
-    display: grid;
+    /*display: grid;*/
     grid-auto-flow: row;
     align-content: flex-start;
     justify-content: flex-start;
@@ -153,6 +157,7 @@ body {
     white-space: nowrap;
     width: 100%;
     padding: 2px 5px 2px 2px;
+    grid-gap: 5px;
 }
 
     .player-highscore .player-name {
@@ -200,11 +205,10 @@ body {
     }
 
     #player-current > .player {
-        grid-template: "blank name tries score" 100px/25px auto auto 120px;
+        grid-template: "blank name tries play score" 100px/25px auto auto 80px 80px;
     }
 
-        #player-current > .player .player-button-delete,
-        #player-current > .player .player-button-start {
+        #player-current > .player .player-button-delete {
             display: none;
         }
 
@@ -215,6 +219,7 @@ body {
         #player-next > .player .player-score {
             display: none;
         }
+
 
     #player-current .player-score {
         grid-area: score;
@@ -255,6 +260,10 @@ body {
     .player-button-start span {
         background: url(../images/play-button.svg) no-repeat center center;
     }
+
+#player-current > .player .player-button-start span {
+    background: url(../images/restart.svg) no-repeat center center;
+}
 
 /*.player > div {
     border: 1px solid red;

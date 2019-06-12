@@ -25,6 +25,15 @@
         hub.DeleteGame(gameDeleteId);
       }
     });
+    let currentArea = document.getElementById(app.currentAreaId);
+    currentArea.addEventListener('click', v => {
+      let target = v.target;
+      if (target.classList.contains(app.startClass) || target.closest(`.${app.startClass}`)) {
+        var gameStartId = target.closest(`.${app.playerClass}`).id;
+        hub.StartGame(gameStartId);
+      }
+    });
+
   },
   GetExistingPlayer: (gameId) => {
     var players = Array.from(document.getElementsByClassName(app.playerClass));
