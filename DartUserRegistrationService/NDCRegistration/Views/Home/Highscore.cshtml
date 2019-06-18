@@ -1,0 +1,12 @@
+﻿@model NDCRegistration.Models.HighscoreModel
+@using NDCRegistration
+@{
+  ViewData["Title"] = "Highscores";
+}
+<ul>
+
+  @foreach (var item in Model.UserJson)
+{
+  <li class="item"> @(item)</li>
+}
+</ul>

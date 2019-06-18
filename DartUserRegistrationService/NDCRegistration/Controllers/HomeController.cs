@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Dart.Messaging.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using NDCRegistration.Hubs;
 using NDCRegistration.Models;
 
@@ -15,9 +17,17 @@ namespace NDCRegistration.Controllers
     [Authorize]
     public class HomeController : Controller
     {
+        private readonly IConfiguration configuration;
+        private readonly IGamerContextMethods gamerContextMethods;
+
+        public HomeController(IConfiguration configuration, IGamerContextMethods gamerContextMethods)
+        {
+            this.configuration = configuration;
+            this.gamerContextMethods = gamerContextMethods;
+        }
         public IActionResult Index()
         {
-             return View();
+            return View();
         }
         public IActionResult About()
         {
@@ -42,6 +52,45 @@ namespace NDCRegistration.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        public IActionResult Highscore()
+        {
+            var uri = configuration.GetValue<string>("ApiUri");
+            var highscoreUsers = MessageHubMethods.FilterTopCompletedGamer(gamerContextMethods.GetGamers());
+            var userJson = new List<string>();
+            foreach (var gamer in highscoreUsers)
+            {
+                try
+                {
+                    using (var client = new HttpClient())
+                    {
+                        if (!float.TryParse(gamer.QrCode, out float number))
+                        {
+                            userJson.Add($"Invalid QR: {gamer.QrCode}");
+                            continue;
+                        }
+                        var userUri = $"{uri}{gamer.QrCode}";
+                        //var userUri = $"{uri}{"9626442211223632793001"}";
+                        var task = client.GetStringAsync(userUri);
+                        task.Wait();
+                        if (!task.IsCompletedSuccessfully)
+                            throw new ApplicationException("error on lookup");
+                        userJson.Add(task.Result);
+                    }
+                }
+                catch (Exception)
+                {
+                    userJson.Add($"Lookup failed for qr {gamer.QrCode}");
+                }
+
+            }
+
+
+            var model = new HighscoreModel
+            {
+                UserJson = userJson
+            };
+            return View(model);
         }
     }
 }

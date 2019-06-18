@@ -29,15 +29,31 @@ namespace NDCRegistration
 
         internal async static Task SendAllCompletedGames(IHubContext<MessageHub> hubContext, List<Gamer> gamers)
         {
-            var games = gamers
-                .Where(f => f.Games.Any(st => st.State == GameState.Completed))
-                .GroupBy(f=>f.Id)
-                .Select(f=>new SignalRGame(f.Key, f.Max(g=>g.DisplayName), f.SelectMany(g=>g.Games)
-                .Where(h=>h.State == GameState.Completed).OrderByDescending(g=>g.Score).ThenBy(g=>g.DateCreated).First(), 3, 3))
-                .OrderByDescending(f => f.Score).ThenBy(f=>f.DateCreated).Take(30)
-                .ToList();
+            List<SignalRGame> games = FilterTopCompletedGames(gamers);
 
             await hubContext.Clients.All.SendAsync(SignalRTopics.GamesCompleted, games);
         }
+
+        public static List<SignalRGame> FilterTopCompletedGames(List<Gamer> gamers)
+        {
+            return gamers
+                .Where(f => f.Games.Any(st => st.State == GameState.Completed))
+                .GroupBy(f => f.Id)
+                .Select(f => new SignalRGame(f.Key, f.Max(g => g.DisplayName), f.SelectMany(g => g.Games)
+                .Where(h => h.State == GameState.Completed).OrderByDescending(g => g.Score).ThenBy(g => g.DateCreated).First(), 3, 3))
+                .OrderByDescending(f => f.Score).ThenBy(f => f.DateCreated).Take(30)
+                .ToList();
+        }
+        public static List<QrScoreModel> FilterTopCompletedGamer(List<Gamer> gamers)
+        {
+            return gamers
+                .Where(f => f.Games.Any(st => st.State == GameState.Completed))
+                .GroupBy(f => f.Id)
+                .Select(f => new QrScoreModel(f.First(), f.SelectMany(g => g.Games)
+                .Where(h => h.State == GameState.Completed).OrderByDescending(g => g.Score).ThenBy(g => g.DateCreated).First()))
+                .OrderByDescending(f => f.Score).ThenBy(f => f.DateCreated).Take(30)
+                .ToList();
+        }
+
     }
 }
