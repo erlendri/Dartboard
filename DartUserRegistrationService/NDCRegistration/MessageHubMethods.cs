@@ -32,8 +32,9 @@ namespace NDCRegistration
             var games = gamers
                 .Where(f => f.Games.Any(st => st.State == GameState.Completed))
                 .GroupBy(f=>f.Id)
-                .Select(f=>new SignalRGame(f.Key, f.Max(g=>g.DisplayName), f.SelectMany(g=>g.Games).Where(h=>h.State == GameState.Completed).Max(h=>h.Score), 3, 3))
-                .OrderByDescending(f => f.Score).Take(30)
+                .Select(f=>new SignalRGame(f.Key, f.Max(g=>g.DisplayName), f.SelectMany(g=>g.Games)
+                .Where(h=>h.State == GameState.Completed).OrderByDescending(g=>g.Score).ThenBy(g=>g.DateCreated).First(), 3, 3))
+                .OrderByDescending(f => f.Score).ThenBy(f=>f.DateCreated).Take(30)
                 .ToList();
 
             await hubContext.Clients.All.SendAsync(SignalRTopics.GamesCompleted, games);

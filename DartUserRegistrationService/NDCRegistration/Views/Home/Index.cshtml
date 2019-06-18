@@ -6,8 +6,10 @@
   <div class="highscore-container" data-id="1">
     Loading highscores...
   </div>
+  <div class="v-spacer"></div>
   <div class="highscore-container" data-id="2">
   </div>
+  <div class="v-spacer"></div>
   <div class="highscore-container" data-id="3">
   </div>
 </div>
@@ -31,8 +33,9 @@
 <template id="player-template">
   <div id="@(Guid.Empty)" class="player">
     <div class="player-name">Player name</div>
-    <div class="player-tries">1</div>
-    <div class="player-score">1234</div>
+    <div class="player-tries hidden">1</div>
+    <div class="player-loading"></div>
+    <div class="player-score hidden">1234</div>
     <div class="player-button-delete player-button"><span></span></div>
     <div class="player-button-start player-button"><span></span></div>
   </div>

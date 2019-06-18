@@ -5,6 +5,7 @@
   playerName: 'player-name',
   playerScore: 'player-score',
   playerTries: 'player-tries',
+  playerLoading: "player-loading",
   playerRank: 'player-rank',
   nextAreaId: 'player-next',
   currentAreaId: 'player-current',
@@ -78,15 +79,21 @@
   UpdatePlayerNode: (node, game) => {
     node.id = game.id;
     node.getElementsByClassName(app.playerScore)[0].innerHTML = game.score;
-    let gameTries = "Waiting for game to start";
+    let gameTries = "";
+    let gameTriesElement = node.getElementsByClassName(app.playerTries)[0];
+    let gameLoadingElement = node.getElementsByClassName(app.playerLoading)[0];
+    let gameScoreElement = node.getElementsByClassName(app.playerScore)[0];
     if (game.maxTries > 0) {
+      gameTriesElement.classList.remove('hidden');
+      gameScoreElement.classList.remove('hidden');
+      gameLoadingElement.classList.add('hidden');
       if (game.tries >= game.maxTries)
         gameTries = "Game completed";
       else {
         gameTries = `Throws remaining: ${game.maxTries - game.tries}`;
       }
     }
-    node.getElementsByClassName(app.playerTries)[0].innerHTML = gameTries;
+    gameTriesElement.innerHTML = gameTries;
     if (game.name !== undefined && game.name !== null)
       node.getElementsByClassName(app.playerName)[0].innerHTML = game.name;
   },
