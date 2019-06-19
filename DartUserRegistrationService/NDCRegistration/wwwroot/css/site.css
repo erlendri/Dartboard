@@ -10,6 +10,7 @@ body {
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
+    min-height: 90vh;
 }
 
 /* Carousel */
@@ -109,10 +110,15 @@ h4 {
     border-radius: 15px;
     background-size: 100% 100%;
     display: grid;
-    justify-items: flex-start;
+    /*justify-items: flex-start;*/
     align-items: center;
     font-size: 25px;
+    position: relative;
 }
+
+    .player > div {
+        min-width: 0px;
+    }
 
     .player .player-name,
     .player .player-score {
@@ -122,6 +128,9 @@ h4 {
     }
 
     .player .player-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         grid-area: name;
         padding-right: 5px;
     }
@@ -134,20 +143,79 @@ h4 {
 
     .player .player-tries {
         display: none;
+        color: #564945;
+        border-radius: 5px;
+        border-style: dashed;
+        padding: 5px;
     }
 
-    .player .player-loading {
-        background: url("../images/Pacman-1s-80px.svg");
-        grid-area: tries;
-        height: 80px;
-        width: 80px;
-        display: none;
-        background-size: 100% 100%;
+@keyframes loading-puls {
+    0% {
     }
+
+    25% {
+        border-radius:5px;
+        color: #afc584;
+    }
+
+    50% {
+        border-radius: 25%;
+        color: #fff;
+    }
+
+    75% {
+        border-radius: 5px;
+        color: #afc584;
+    }
+
+    100% {
+    }
+}
+
+@keyframes bg-slide {
+    0% {
+        transform: translateX(0px);
+        opacity: 0;
+    }
+
+    10% {
+        transform: translateX(5vw);
+        opacity: 1;
+    }
+
+    90% {
+        transform: translateX(calc(45vw));
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(calc(50vw));
+        opacity: 0;
+    }
+}
+
+.player .player-loading {
+    background: url("../images/Pacman-1s-80px.svg");
+    grid-area: blank;
+    height: 80px;
+    width: 80px;
+    display: none;
+    background-size: 100% 100%;
+    animation: bg-slide 7s linear infinite;
+    position: absolute;
+    top: calc(50% - 40px);
+    transform: translateY(-50%);
+    left: 0px;
+}
+
+.player .player-tries.loading {
+    animation: bg-slide 7s linear infinite;
+    animation: loading-puls 7s linear infinite;
+}
 
 .highscore-container-wrapper {
     display: grid;
-    grid-template: "left sp1 middle sp2 right" auto/auto 5px auto 5px auto;
+    grid-template: "left sp1 middle sp2 right" auto/calc(33% - 5px) 5px calc(33% - 5px) 5px calc(33% - 5px);
     grid-gap: 5px;
     align-content: center;
     background: url("../images/playerbackground.svg");
@@ -168,17 +236,19 @@ h4 {
     }
 
 .highscore-container {
-    /*display: grid;*/
+    display: grid;
     grid-auto-flow: row;
-    align-content: flex-start;
-    justify-content: flex-start;
+    /*grid-template: "left middle right"*/
+    /*align-content: flex-start;
+    justify-content: flex-start;*/
 }
 
 .player-highscore {
     display: grid;
     grid-template: "rank name score" auto/30px auto 40px;
     white-space: nowrap;
-    width: 100%;
+    /*grid-template: "rank name score" auto/auto auto auto;*/
+    /*width: 100%;*/
     padding: 2px 5px 2px 2px;
     grid-gap: 5px;
 }
@@ -189,7 +259,8 @@ h4 {
 
     .player-highscore .player-name {
         text-align: left;
-        max-width: calc(100% - 80px); /*player-highscore gap 5px + wrapper gap 5px + rank & name widths*/
+        /*player-highscore gap 5px + wrapper gap 5px + rank & name widths*/
+        /*max-width: calc(100% - 80px);*/
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -198,8 +269,22 @@ h4 {
         text-align: right;
     }
 
+.player-tries-short {
+    display: none;
+}
+
 /* Hide/rearrange for smaller screens */
 @media screen and (max-width: 767px) {
+    body {
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
+
+    .body-content {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
     .carousel-caption {
         padding-top: 0px;
         padding-bottom: 0px;
@@ -211,12 +296,27 @@ h4 {
 
     .highscore-container-wrapper {
         grid-gap: 5px;
+        /*grid-template: "left" auto/auto;
+        border-radius: 0px;*/
     }
+
+    /*.highscore-container-wrapper > div {
+            display: none;
+        }
+
+            .highscore-container-wrapper > div:nth-child(1) {
+                display: grid;
+            }*/
 
     .player-highscore {
         padding: 1px 1px 1px 1px;
         font-size: 7px;
+        grid-template: "rank name score" auto/20px auto 25px;
     }
+
+        .player-highscore .player-name {
+            /*max-width: none;*/
+        }
 }
 
 
@@ -232,7 +332,7 @@ h4 {
     }
 
     #player-current > .player {
-        grid-template: "blank name tries play score" 100px/25px auto auto 80px 80px;
+        grid-template: "blank name tries play score" 100px/25px 1fr auto 80px 80px;
     }
 
         #player-current > .player .player-button-delete {
@@ -240,8 +340,11 @@ h4 {
         }
 
     #player-next > .player {
-        grid-template: "blank name delete play" 80px/25px auto 80px 80px;
+        grid-template: "blank name delete play" 80px/25px 1fr 80px 80px;
     }
+
+        #player-next > .player .player-name {
+        }
 
         #player-next > .player .player-score {
             display: none;
@@ -262,6 +365,22 @@ h4 {
         /*background-size: 100% 100%;*/
     }
 
+@media screen and (max-width: 767px) {
+    #player-current > .player {
+        grid-template: "name tries play score" auto "tries tries tries" auto/1fr auto 80px 80px;
+    }
+
+    #player-current .player-loading {
+        background-size: 20px 100%;
+        width: auto;
+        height: auto;
+    }
+
+    #player-current .player-tries-short {
+        display: block;
+        grid-area: tries;
+    }
+}
 
 
 .player-button span {
