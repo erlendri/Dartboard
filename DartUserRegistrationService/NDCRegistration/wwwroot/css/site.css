@@ -103,6 +103,7 @@ h4 {
     height: 100%;
     bottom: 0px;
 }
+
 #prize {
     font-size: 16px;
     margin-top: 5px;
@@ -129,6 +130,9 @@ h4 {
     height: 200px;
     width: auto;
 }*/
+.player-highscore .player-name a {
+    color: white !important;
+}
 .player {
     background: url("../images/playerbackground.svg");
     border-radius: 15px;
@@ -148,7 +152,7 @@ h4 {
     .player .player-score {
         padding: 15px 7px 15px 5px;
         font-weight: bold;
-        color: white;
+        color: white !important;
     }
 
     .player .player-name {
@@ -236,7 +240,9 @@ h4 {
     animation: bg-slide 7s linear infinite;
     animation: loading-puls 7s linear infinite;
 }
-
+body > div > div.highscore-container-wrapper > div > div > a {
+    color: white !important;
+}
 .highscore-container-wrapper {
     display: grid;
     grid-template: "left sp1 middle sp2 right" auto/calc(33% - 5px) 5px calc(33% - 5px) 5px calc(33% - 5px);
@@ -246,7 +252,7 @@ h4 {
     border-radius: 15px;
     background-size: 100% 100%;
     padding: 7px 15px 7px 15px;
-    color: white;
+    color: white !important;
     margin-bottom: 15px;
     font-size: 20px;
 }

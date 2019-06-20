@@ -122,7 +122,8 @@
       node.getElementsByClassName(app.playerScore)[0].innerHTML = game.score;
       if (game.name !== undefined && game.name !== null)
         node.getElementsByClassName(app.playerName)[0].innerHTML = game.name;
-
+      var lnk = node.querySelector('a');
+      lnk.href = lnk.href.replace('_qrcode_', `${game.id}`);
     }
     console.log(toShow);
   },

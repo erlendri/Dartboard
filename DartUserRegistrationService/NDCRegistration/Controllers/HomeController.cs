@@ -53,36 +53,32 @@ namespace NDCRegistration.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        public IActionResult Highscore()
+        public IActionResult Highscore(string qr)
         {
             var uri = configuration.GetValue<string>("ApiUri");
-            var highscoreUsers = MessageHubMethods.FilterTopCompletedGamer(gamerContextMethods.GetGamers());
+            var gamerId = Guid.Parse(qr);
+            var gamer = gamerContextMethods.GetGamer(gamerId);
             var userJson = new List<string>();
-            foreach (var gamer in highscoreUsers)
+            try
             {
-                try
+                using (var client = new HttpClient())
                 {
-                    using (var client = new HttpClient())
+                    if (!float.TryParse(gamer.QrCode, out float number))
                     {
-                        if (!float.TryParse(gamer.QrCode, out float number))
-                        {
-                            userJson.Add($"Invalid QR: {gamer.QrCode}");
-                            continue;
-                        }
-                        var userUri = $"{uri}{gamer.QrCode}";
-                        //var userUri = $"{uri}{"9626442211223632793001"}";
-                        var task = client.GetStringAsync(userUri);
-                        task.Wait();
-                        if (!task.IsCompletedSuccessfully)
-                            throw new ApplicationException("error on lookup");
-                        userJson.Add(task.Result);
+                        userJson.Add($"Invalid QR: {gamer.QrCode}");
                     }
+                    var userUri = $"{uri}{gamer.QrCode}";
+                    //var userUri = $"{uri}{"9626442211223632793001"}";
+                    var task = client.GetStringAsync(userUri);
+                    task.Wait();
+                    if (!task.IsCompletedSuccessfully)
+                        throw new ApplicationException($"error on lookup. code: {task.Result}");
+                    userJson.Add(task.Result);
                 }
-                catch (Exception)
-                {
-                    userJson.Add($"Lookup failed for qr {gamer.QrCode}");
-                }
-
+            }
+            catch (Exception ex)
+            {
+                userJson.Add($"Lookup failed for qr {gamer.QrCode}");
             }
 
 
