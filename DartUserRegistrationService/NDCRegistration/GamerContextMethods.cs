@@ -235,7 +235,8 @@ namespace NDCRegistration
                 {
                     var currentGuid = currentGameId ?? Guid.Empty;
                     var dbContext = scope.ServiceProvider.GetRequiredService<GamerContext>();
-                    var gamesCompleted = dbContext.Games.Where(f => f.State == GameState.Completed).GroupBy(f => f.GamerId).Select(g => g.OrderByDescending(h => h.Score).First()).Take(100);
+                    var gamesCompleted = dbContext.Games.Where(f => f.State == GameState.Completed).GroupBy(f => f.GamerId)
+                        .Select(g => g.OrderByDescending(h => h.Score).First()).OrderByDescending(f=>f.Score).ThenBy(f=>f.DateCreated).Take(100);
                     var gamesPendingOrCurrent = dbContext.Games.Where(f => f.State == GameState.Pending || f.Id == currentGuid);
                     var gamersAll = (from game in gamesCompleted.Union(gamesPendingOrCurrent)
                                      join gamer in dbContext.Gamers.Include(f => f.Games) on game.GamerId equals gamer.Id

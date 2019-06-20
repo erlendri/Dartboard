@@ -19,6 +19,7 @@ namespace NDCRegistration.MessageHubModels
             Tries = tries;
             MaxTries = maxTries;
             DateCreated = dateCreated;
+            Nonce = Guid.NewGuid();
         }
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -26,5 +27,6 @@ namespace NDCRegistration.MessageHubModels
         public int Tries { get; set; }
         public int MaxTries { get; set; }
         public DateTime? DateCreated { get; }
+        public Guid Nonce { get; set; }
     }
 }

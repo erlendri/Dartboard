@@ -38,7 +38,8 @@ namespace NDCRegistration
         }
         public void SyncClientGames()
         {
-            var gamers = _gamerStorage.GetRelevantGamers(CurrentGame?.Id);
+            //var gamers = _gamerStorage.GetRelevantGamers(CurrentGame?.Id);
+            var gamers = _gamerStorage.GetGamers();
             if (CurrentGame != null)
             {
                 var currentGame = gamers.SelectMany(f => f.Games).FirstOrDefault(g => g.Id == CurrentGame.Id);
@@ -75,7 +76,7 @@ namespace NDCRegistration
         {
             if (CurrentGame != null && CurrentGame.Id != game.Id && CurrentGame.State == GameState.Pending)
             {
-                _gamerStorage.DeleteGame(CurrentGame.Id);
+                _gamerStorage.CompleteGame(CurrentGame);
             }
             if (game == null)
                 CurrentGame = null;
