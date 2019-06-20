@@ -13,14 +13,16 @@
   <div class="highscore-container" data-id="3">
   </div>
 </div>
-
+<div id="prize" class="section">
+  Win a Google Home! The winner is randomly selected from the top 30 players &#64 4.15pm on Friday.
+</div>
 <h4>Currently playing</h4>
 @*Remove when going live - start*@
 @*<div style="padding: 5px">
-  <input type="button" onclick="hub.SendTestDart();" value="Test throw dart" />
-  <input type="button" onclick="hub.SendTestScore();" value="Test update score" />
-  <input type="button" onclick="hub.SendTestCreate();" value="Create testplayer" />
-</div>*@
+    <input type="button" onclick="hub.SendTestDart();" value="Test throw dart" />
+    <input type="button" onclick="hub.SendTestScore();" value="Test update score" />
+    <input type="button" onclick="hub.SendTestCreate();" value="Create testplayer" />
+  </div>*@
 @*Remove when going live - end*@
 <div id="player-current" class="section">
   Getting current player...
@@ -30,6 +32,25 @@
 <div id="player-next" class="section">
   Getting players up next...
 </div>
+@*<hr />
+<div id="game-price" class="section">
+  <div id="game-price-text">
+    <p>
+      Win a Google Home!
+    </p>
+    The contest lasts until 4PM on Friday.
+    <p>
+    </p>
+    <p>
+      The winner is randomly selected from the top 30 players,
+    </p>
+    <p>
+      and must be present &#64; our booth to receive the spoils of victory.
+    </p>
+
+  </div>
+  <div id="game-price-image"><img src="~/images/MVIMG_20190620_102620.jpg" /></div>
+</div>*@
 <template id="player-template">
   <div id="@(Guid.Empty)" class="player">
     <div class="player-name">Player name</div>

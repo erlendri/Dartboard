@@ -103,8 +103,32 @@ h4 {
     height: 100%;
     bottom: 0px;
 }
-
-
+#prize {
+    font-size: 16px;
+    margin-top: 5px;
+    margin-bottom: 45px;
+    font-weight: bold;
+}
+/*#game-price {
+    display: grid;
+    grid-auto-flow: column;
+}
+#game-price-text-container {
+    display: grid;
+    grid-auto-flow: column;
+    align-items: flex-start;
+    justify-content: center;
+    grid-gap: 15px;
+}
+#game-price-image {
+    display: grid;
+    justify-content: center;
+}
+#game-price-image > img {
+    border: 1px solid black;
+    height: 200px;
+    width: auto;
+}*/
 .player {
     background: url("../images/playerbackground.svg");
     border-radius: 15px;
@@ -154,7 +178,7 @@ h4 {
     }
 
     25% {
-        border-radius:5px;
+        border-radius: 5px;
         color: #afc584;
     }
 
@@ -223,7 +247,7 @@ h4 {
     background-size: 100% 100%;
     padding: 7px 15px 7px 15px;
     color: white;
-    margin-bottom: 55px;
+    margin-bottom: 15px;
     font-size: 20px;
 }
 
