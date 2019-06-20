@@ -54,9 +54,9 @@
     function SetFieldFromLookup(value, key) {
       if (value == null)
         return;
-      if (key.value.trim().length == 0) {
+      //if (key.value.trim().length == 0) {
         key.value = value;
-      }
+      //}
     }
     let hub = {
       LookupQr: (qr) => {
@@ -67,8 +67,10 @@
     let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
     let qrcode = document.getElementById('qrCode');
     qrcode.addEventListener('blur', () => {
-      if (qrcode.value.length > 0)
+      if (qrcode.value.length > 0) {
         hub.LookupQr(qrcode.value);
+
+      }
     });
     scanner.addListener('scan', function (content) {
       qrcode.value = content;
